@@ -1,0 +1,8 @@
+{
+    "toggl": {
+        "api": "https://api.track.toggl.com/api/v9/"
+    },
+    "jira": {
+        "api": "https://your-domain.atlassian.net/rest/api/3/"
+    }
+}

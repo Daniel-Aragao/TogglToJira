@@ -1,0 +1,17 @@
+{
+  "name": "toggltojira",
+  "version": "1.0.0",
+  "description": "Tool to get Toggle time data to be uploaded on Jira",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "init": "node index.js toggl-user=$USER:$PASSWORD"
+  },
+  "author": "Daniel Aragao Abreu Filho",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^3.3.8",
+    "node-fetch": "^3.3.0"
+  }
+}
