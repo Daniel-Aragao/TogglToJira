@@ -11,7 +11,10 @@ const defaultConfig = readConfig();
 let services = {
     Toggl: new TogglService(defaultConfig, credentials),
     Credentials: credentials,
-    Arguments: {interval: {From: '', To: ''}}
+    Arguments: {interval: {From: '', To: ''}, preview: {
+        isActive: false,
+        fields: ['at', 'duration', 'description']
+    }}
 }
 
 let promises = [];

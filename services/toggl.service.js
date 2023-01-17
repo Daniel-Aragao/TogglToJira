@@ -1,4 +1,18 @@
 import fetch from "node-fetch";
+import { toUnix } from "../utils.js";
+
+const minimumFields = ['at', 'duration', 'description'];
+const ticketRegex = /(\w{1,3}-\d{1,5})\s*(.*)/
+
+const addFields = (fields) => {
+  minimumFields.forEach((field) => {
+    if(fields.findIndex((f1) => f1 === field) < 0) {
+      fields.push(field);
+    }
+  })
+
+  return fields;
+}
 
 export class TogglService {
   baseUrl;
@@ -34,18 +48,19 @@ export class TogglService {
   /**
    * @param from Format YYYY-MM-DD to get time entries from this date. defaults for today
    * @param to Format YYYY-MM-DD to get time entries to this date
+   * @param fields string[] specifying which ids will be filtered from the results
    */
-  async getLogs(from, to) {
+  async getLogs(from, to, fields=undefined) {
     if(!this.token) {
         throw `Please inform a valid token in ${this.Credentials?.path} ::toggl.token`
     }
 
     let hasTo = !!to;
     let hasFrom = !!from;
-    let now = new Date().toISOString();
+    let now = new Date();
 
-    let fromQuery = hasTo? `start_date=${from ?? now}` : `since=${from ? new Date(from).toISOString() : now }`
-    let toQuery = hasFrom? `end_date=${to ?? now}` : `before=${to ? new Date(to).toISOString() : now }`
+    let fromQuery = hasFrom ? (hasTo? `start_date=${from ?? now.toISOString()}` : `since=${toUnix(from ? new Date(from) : now) }`) : ''
+    let toQuery = hasTo ? (hasFrom? `end_date=${to ?? now.toISOString()}` : `before=${toUnix(to ? new Date(to) : now)}`) : '';
 
     let response = await fetch(`${this.baseUrl}me/time_entries?${fromQuery}&${toQuery}`, {
       method: "GET",
@@ -62,10 +77,39 @@ export class TogglService {
 
       return logs.filter((value) => {
         return this.Credentials.toggl.workspaceId === value.workspace_id
-      });
+      }).map(value => {
+        let newObj = {};
+
+        fields = fields ?? minimumFields;
+
+        addFields(fields);
+
+        for(const key of fields) {
+          if(key){
+            if(key === 'description') {
+              let mapToTicket = this.MapToTicket(value[key]);
+              newObj[key] = mapToTicket.description;
+              newObj['ticket'] = mapToTicket.ticket;
+            } else {
+              newObj[key] = value[key];
+            }
+          }
+        }
+
+        return newObj;
+      });      
     }
 
     throw new Error(`Toggl :: get time logs::Status:${response.status}`);
+  }
+
+  MapToTicket(description) {
+    if(ticketRegex.test(description)) {
+      let match = ticketRegex.exec(description);
+      return {ticket: match[1], description: match[2]};
+    }
+    
+    return {description: description};
   }
 
   async getToken(user, password) {
