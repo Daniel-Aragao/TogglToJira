@@ -1,10 +1,8 @@
-import fs from 'fs';
-
 export async function configToggl(value, togglService, credentialsConfig) {
     try{
-        let [user, password] = value.split("=")?.[1].split(":");
+        let [user, password] = value.split("=")?.[1]?.split(":") ?? [undefined, undefined];
         if(!user || !password) {
-            throw `\n\nMalformed arg:${value} \nToggl config => expected(user=email:password)\n\n;`
+            throw `\nMalformed arg:${value} \nToggl config => expected(user=email:password)\n`
         } 
 
         await togglService.getToken(user, password).then((obj) => {

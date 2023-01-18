@@ -9,10 +9,17 @@ One option of use is that every day the tool is going to send the time logs auto
 1. Add the credentials
 1. Your are good to go
 
+### Running from any directory for now its limited
+Example:
+```
+node C:/Users/daniel.filho/Git/TogglToJira/index.js today
+```
+> The shell/bash scripts are going to be created in the future
+
 ## Credentials
 The credentials file can be created in the first run, just include the credentials to Toggl and Jira
 ```
-npm start -- toggl-user=email:password
+node index.js toggl-user=email:password
 ```
 
 The credentials might be run separately but be aware that the credentials.json file will be overridden for the respective credentials been setup. For example: if you run twice the `toggl-user` command the last information will prevail. If you change the properties manually, be aware not to run the `toggl-user` command again
@@ -21,24 +28,24 @@ The credentials might be run separately but be aware that the credentials.json f
 ## Run
 ### From a date (Since the given date)
 ```
-npm start -- 2023-01-06
+node index.js 2023-01-06
 ```
 
 ### From a date to another
 ```
-npm start -- 2023-01-06:2023-01-17
+node index.js 2023-01-06:2023-01-17
 ```
 > If the dates are equal the results will be empty
 
 ### To preview only
 ```
-npm start -- 2023-01-06:2023-01-17 -p
+node index.js 2023-01-06:2023-01-17 -p
 ```
 > This will prevent the data to be sent to Jira
 
 ### To preview only selecting [fields](Toggl-fields)
 ```
-npm start -- 2023-01-06:2023-01-17 preview=workspace_id,start,stop
+node index.js 2023-01-06:2023-01-17 preview=workspace_id,start,stop
 ```
 > The fields `ticket`, `description`, `duration` and `start` will always be returned  
 
@@ -81,6 +88,7 @@ LB-550
 1. The dates shall not be the same or the results are going to be empty
     - If you want a specific day try to use the date you want and the date + 1 day
 1. The tool currently doesn't check for duplicates, be aware of your input
+1. Jira only accepts logs with more than 60 seconds so anything lower than this is going to be discarded
 
 ## Toggl fields
 ```

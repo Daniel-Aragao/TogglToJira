@@ -11,7 +11,7 @@ const defaultConfig = readConfig();
 
 let services = {
     Toggl: new TogglService(defaultConfig, credentials),
-    // Jira: new JiraService(defaultConfig, credentials),
+    Jira: new JiraService(defaultConfig, credentials),
     Credentials: credentials,
     Arguments: {interval: {From: '', To: ''}, preview: {
         isActive: false,
@@ -28,8 +28,8 @@ process.argv.forEach((val, index) => {
 
 Promise.all(promises).then(async () => {
     services.Toggl.validService();
+    services.Jira.validService();
     await Main(services);
 }).catch(e => {
-    console.error(e);
-    e.cause && console.error(e.cause);
+    e.cause ? console.error(e.cause) : console.error(e) ;
 });
