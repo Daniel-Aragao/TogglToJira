@@ -1,5 +1,5 @@
 # CLI tool to upload Toggl info into Jira
-This tool was created to be used with Toggl by getting all the data from Toggl during an interval and sending it to Jira.
+This tool was created to be used with [Toggl](https://toggl.com/track) tracker by getting all the data from Toggl during an interval and sending it to Jira.
 One option of use is that every day the tool is going to send the time logs automatically using a job software such as crontab
 
 ## Contents
