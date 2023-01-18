@@ -4,7 +4,7 @@ import { interpretArgument } from "./args/arguments-reader.js";
 import { Main } from "./runner.js";
 import { readConfig } from "./services/config-reader.js";
 import { JiraService } from "./services/jira.service.js";
-import { TogglService } from "./services/toggl.service.js";
+import { minimumFields, TogglService } from "./services/toggl.service.js";
 
 const credentials = readConfig('credentials.json');
 const defaultConfig = readConfig();
@@ -15,7 +15,7 @@ let services = {
     Credentials: credentials,
     Arguments: {interval: {From: '', To: ''}, preview: {
         isActive: false,
-        fields: ['at', 'duration', 'description']
+        fields: JSON.parse(JSON.stringify(minimumFields))
     }}
 }
 

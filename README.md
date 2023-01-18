@@ -68,7 +68,7 @@ node index.js 2023-01-06:2023-01-17 -p
 ```
 node index.js 2023-01-06:2023-01-17 preview=workspace_id,start,stop
 ```
-> The fields `ticket`, `description`, `duration` and `start` will always be returned  
+> The fields `id`, `ticket`, `description`, `duration` and `start` will always be returned  
 
 ## Jira mapping
 The field `ticket` is extracted from the description using regex, this will be used to map the ticket on `Jira` 
