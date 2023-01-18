@@ -2,11 +2,23 @@
 This tool was created to be used with Toggl by getting all the data from Toggl during an interval and sending it to Jira.
 One option of use is that every day the tool is going to send the time logs automatically using a job software such as crontab
 
+## Contents
+1. [Installing](#installing)
+    1. [Running outside project folder](#running-from-any-directory-for-now-its-limited)
+1. [Credentials](#credentials)
+    1. [Toggl credentials](#toggl-credentials)
+    1. [Jira credentials](#jira-credentials)
+1. [Run](#run)
+1. [Jira Mapping](#jira-mapping)
+1. [Arguments](#arguments)
+1. [Warnings](#warnings)
+1. [Toggl fields](#toggl-fields)
+
 > Currently it depends on the time track recorded previously in a third party tool and is not checking for duplicates
 
 ## Installing
 1. To begin with run `npm i` in the root of the project.
-1. Add the credentials
+1. Add [Toggl](#toggl-credentials) and [Jira](#jira-credentials) credentials
 1. Your are good to go
 
 ### Running from any directory for now its limited
@@ -18,12 +30,21 @@ node C:/Users/daniel.filho/Git/TogglToJira/index.js today
 
 ## Credentials
 The credentials file can be created in the first run, just include the credentials to Toggl and Jira
+
+### Toggl credentials
 ```
 node index.js toggl-user=email:password
 ```
-
-The credentials might be run separately but be aware that the credentials.json file will be overridden for the respective credentials been setup. For example: if you run twice the `toggl-user` command the last information will prevail. If you change the properties manually, be aware not to run the `toggl-user` command again
 > The email and password data are not persisted, but the generated user token
+### Jira credentials
+```
+node index.js jira-user=email:api_token
+```
+>To get Jira api_token access the [Atlassian tutorial](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)
+
+The credentials might be run separately but be aware that the credentials.json file will be overridden for the respective credentials been setup.  
+Example: if you run twice the `toggl-user` command the last information will prevail. If you change the properties manually, be aware not to run the `toggl-user` command again
+
 
 ## Run
 ### From a date (Since the given date)
@@ -43,7 +64,7 @@ node index.js 2023-01-06:2023-01-17 -p
 ```
 > This will prevent the data to be sent to Jira
 
-### To preview only selecting [fields](Toggl-fields)
+### To preview only selecting [fields](#toggl-fields)
 ```
 node index.js 2023-01-06:2023-01-17 preview=workspace_id,start,stop
 ```
