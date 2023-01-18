@@ -1,4 +1,9 @@
 # CLI tool to upload Toggl info into Jira
+This tool was created to be used with Toggl by getting all the data from Toggl during an interval and sending it to Jira.
+One option of use is that every day the tool is going to send the time logs automatically using a job software such as crontab
+
+> Currently it depends on the time track recorded previously in a third party tool and is not checking for duplicates
+
 ## Installing
 1. To begin with run `npm i` in the root of the project.
 1. Add the credentials
@@ -10,32 +15,37 @@ The credentials file can be created in the first run, just include the credentia
 npm start -- toggl-user=email:password
 ```
 
-The credentials might be run separately but be aware that the credentials.json file will be overridden for the respective credentials been setup. For example: if you run twice the toggl-user command the last information will prevail. If you change the properties manually, be aware not to run the toggl-user command again
-> The email and password data are not been saved, but the user token
+The credentials might be run separately but be aware that the credentials.json file will be overridden for the respective credentials been setup. For example: if you run twice the `toggl-user` command the last information will prevail. If you change the properties manually, be aware not to run the `toggl-user` command again
+> The email and password data are not persisted, but the generated user token
 
 ## Run
-### From a date
+### From a date (Since the given date)
 ```
 npm start -- 2023-01-06
 ```
+
 ### From a date to another
 ```
 npm start -- 2023-01-06:2023-01-17
 ```
+> If the dates are equal the results will be empty
+
 ### To preview only
 ```
 npm start -- 2023-01-06:2023-01-17 -p
 ```
+> This will prevent the data to be sent to Jira
+
 ### To preview only selecting [fields](Toggl-fields)
 ```
 npm start -- 2023-01-06:2023-01-17 preview=workspace_id,start,stop
 ```
-> The fields `ticket`, `description`, `duration` and `at` will always be returned  
+> The fields `ticket`, `description`, `duration` and `start` will always be returned  
 
 ## Jira mapping
-`ticket` is extract from the description using regex, this will be used to map the ticket on `Jira` 
+The field `ticket` is extracted from the description using regex, this will be used to map the ticket on `Jira` 
 
-To make the mapping work the user must respect the pattern on his time log:
+To make the mapping work the user must respect the pattern on his time log tool:
 ```
 <ticket(1-3 chars)>-<1-5 numbers>description?
 ```
@@ -61,8 +71,16 @@ LB-550
 | name | description |
 |---|---|
 | -p | Set preview only, don't access Jira |
-| preview=field1,field2 | The same as -p, plus adding the wanted fields array comma separated |
-| date1:date2 | To inform the date filter from date1 to date2. the ':' is not needed then date2 is not sent |
+| preview=field1,field2 | The same as -p, but allows to add the wanted fields comma separated |
+| date1:date2 | To inform the date filter from date1 to date2. The ':' is not needed then date2 is not sent |
+| today | Set date1 = today's date and date2 as tomorrow, returning only the logs from today |
+| yesterday | Set date1 = yesterday's date and date2 as today, returning only the logs from yesterday |
+
+## Warnings
+1. The date is going to be converted to GMT so if you are not aware of your logs try to set preview mode with `-p`
+1. The dates shall not be the same or the results are going to be empty
+    - If you want a specific day try to use the date you want and the date + 1 day
+1. The tool currently doesn't check for duplicates, be aware of your input
 
 ## Toggl fields
 ```
@@ -75,7 +93,7 @@ LB-550
     "start": "2023-01-17T18:11:38+00:00",
     "stop": null,
     "duration": number, //  if negative its running
-    "description": "LB-123 doing stuff",
+    "description": "LB-123 doing fun stuff",
     "tags": null,
     "tag_ids": null,
     "duronly": true,

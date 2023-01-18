@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
-import { toUnix } from "../utils.js";
+import { toDateFromISOtoGMT, toUnix } from "../utils.js";
 
-const minimumFields = ['at', 'duration', 'description'];
+const minimumFields = ['start', 'duration', 'description'];
 const ticketRegex = /(\w{1,3}-\d{1,5})\s*(.*)/
 
 const addFields = (fields) => {
@@ -45,6 +45,33 @@ export class TogglService {
     }
   }
 
+  getIntervalQuery(from, to){
+    let hasTo = !!to;
+    let hasFrom = !!from;
+
+    let fromQuery = '';
+    let toQuery = '';
+
+    if(hasFrom) {
+
+      let fromDate = toDateFromISOtoGMT(from);
+      
+      if(hasTo){
+        let toDate = toDateFromISOtoGMT(to);
+
+        fromQuery = `start_date=${fromDate.toISOString()}`;
+        toQuery = `end_date=${toDate.toISOString()}`;
+      } else {
+        fromQuery = `since=${toUnix(fromDate)}`;
+      }
+    }
+
+    return {
+      from: fromQuery,
+      to: toQuery
+    }
+  }
+
   /**
    * @param from Format YYYY-MM-DD to get time entries from this date. defaults for today
    * @param to Format YYYY-MM-DD to get time entries to this date
@@ -55,14 +82,9 @@ export class TogglService {
         throw `Please inform a valid token in ${this.Credentials?.path} ::toggl.token`
     }
 
-    let hasTo = !!to;
-    let hasFrom = !!from;
-    let now = new Date();
+    let interval = this.getIntervalQuery(from, to);
 
-    let fromQuery = hasFrom ? (hasTo? `start_date=${from ?? now.toISOString()}` : `since=${toUnix(from ? new Date(from) : now) }`) : ''
-    let toQuery = hasTo ? (hasFrom? `end_date=${to ?? now.toISOString()}` : `before=${toUnix(to ? new Date(to) : now)}`) : '';
-
-    let response = await fetch(`${this.baseUrl}me/time_entries?${fromQuery}&${toQuery}`, {
+    let response = await fetch(`${this.baseUrl}me/time_entries?${interval.from}&${interval.to}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
