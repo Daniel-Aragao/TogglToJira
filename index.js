@@ -4,6 +4,7 @@ import { interpretArgument } from "./args/arguments-reader.js";
 import { Main } from "./runner.js";
 import { readConfig } from "./services/config-reader.js";
 import { JiraService } from "./services/jira.service.js";
+import { exceptionLog } from "./services/log-entries.js";
 import { minimumFields, TogglService } from "./services/toggl.service.js";
 
 const credentials = readConfig('credentials.json');
@@ -31,5 +32,7 @@ Promise.all(promises).then(async () => {
     services.Jira.validService();
     await Main(services);
 }).catch(e => {
-    e.cause ? console.error(e.cause) : console.error(e) ;
+    e.cause ? console.error(e.cause) : console.error(e);
+
+    exceptionLog(e);
 });

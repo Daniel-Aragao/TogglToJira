@@ -49,3 +49,29 @@ export async function logEntries(jiraLogs, from) {
     }
   });
 }
+
+export function exceptionLog(exception) {
+  try {
+    let dir = getFailDir("");
+
+    let existsDir = fs.existsSync(dir);
+
+    if (!existsDir) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    let data = `============== ${new Date().toISOString()} ==============\n`;
+    data += exception.stack;
+    if(exception.cause){
+      data += "\n" + exception.cause.stack + "\n";
+    }
+    data += `\n====================================================== \n\n`;
+
+    fs.appendFileSync(
+      path.join(dir, "Exceptions.txt"),
+      data ?? "Fail to parse log"
+    );
+  } catch(e) {
+    console.error(e);
+  }
+}
