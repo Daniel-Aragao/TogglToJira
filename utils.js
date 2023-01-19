@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 
 export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/** Transform from Miliseconds to seconds */
 export const toUnix = (date) => Math.floor(date.getTime() / 1000);
 
 export const toDateFromISOtoGMT = (dateString) => {

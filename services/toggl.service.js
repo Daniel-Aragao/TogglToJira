@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { toDateFromISOtoGMT, toUnix } from "../utils.js";
+import { toDateFromISOtoGMT, toPartialISOString } from "../utils.js";
 
 export const minimumFields = ["id", "start", "duration", "description"];
 const ticketRegex = /(\w{1,3}-\d{1,5})\s*(.*)/;
@@ -54,14 +54,17 @@ export class TogglService {
 
     if (hasFrom) {
       let fromDate = toDateFromISOtoGMT(from);
+      fromQuery = `start_date=${fromDate.toISOString()}`;
 
       if (hasTo) {
         let toDate = toDateFromISOtoGMT(to);
 
-        fromQuery = `start_date=${fromDate.toISOString()}`;
         toQuery = `end_date=${toDate.toISOString()}`;
       } else {
-        fromQuery = `since=${toUnix(fromDate)}`;
+        let now = new Date();
+        now.setDate(now.getDate() + 1);
+
+        toQuery = `end_date=${(toDateFromISOtoGMT(toPartialISOString(now))).toISOString()}`;
       }
     }
 
