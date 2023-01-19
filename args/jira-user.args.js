@@ -15,8 +15,8 @@ export function configJira(value, jiraService, credentialsConfig) {
         console.log('Jira config => Updating configurations', credentials)
 
         credentials.jira = credentials.jira ?? {};
-        credentials.jira.token = user;
-        credentials.jira.user = token;
+        credentials.jira.token = token;
+        credentials.jira.user = user;
 
         console.log('Jira config => New configurations', credentials);
         credentialsConfig.set(credentials);

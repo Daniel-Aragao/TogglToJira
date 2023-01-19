@@ -38,31 +38,46 @@ export class JiraService {
     let promises = [];
 
     logs.forEach((log) => {
-      promise.push(
-        fetch(`${baseUrl}issue/${log.ticket}/worklog`, {
+      promises.push(
+        fetch(`${this.baseUrl}issue/${log.ticket}/worklog`, {
           method: "POST",
           headers: {
             Authorization: `Basic ${Buffer.from(
               `${this.user}:${this.token}`
             ).toString("base64")}`,
-            Accept: "application/json",
             "Content-Type": "application/json",
           },
-          body: log.data,
+          body: JSON.stringify(log.data),
         })
-          .then(() => {
-            log.uploadedOnJira = true;
+          .then((response) => {
+            if (response.status === 201) {
+              log.uploadedOnJira = true;
+            } else {
+              log.uploadedOnJira = false;
+              log.status = response.status;
+
+            }
+            if(response.headers.get("content-type").indexOf("json") >= 0) {
+              return response.json();
+            } else {
+              return response.text();
+            }
+          })
+          .then((message) => {            
+            if (message?.errorMessages) {
+              log.message = message.errorMessages.join(";");
+            } else if (message) {
+              log.message = message;
+            }
           })
           .catch((err) => {
+            log.error = err;
             log.uploadedOnJira = false;
-            log.errorJira = err;
           })
       );
     });
 
     await Promise.allSettled(promises);
-
-    return logs;
   }
 
   async addCredentials(user, token) {

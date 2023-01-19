@@ -1,3 +1,4 @@
+import { logEntries, logEntry } from "./services/log-entries.js";
 import { mapToJira } from "./utils.js";
 
 export async function Main(services) {
@@ -16,9 +17,15 @@ export async function Main(services) {
       console.log("==== Filtered time logs ====");
       console.table(reportLogs);
     }
-  } else {
+  } else if (timeLogs.length > 0) {
     let jiraTimeLogs = mapToJira(timeLogs);
-    // services.Jira.pushLogs(mappedTimeLogs);
+
+    await services.Jira.pushLogs(jiraTimeLogs);
+
+    console.log("==== Time logs to sent ====");
+    console.table(jiraTimeLogs);
+
+    await logEntries(jiraTimeLogs, services.Arguments.From)
   }
 }
 

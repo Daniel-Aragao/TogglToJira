@@ -19,13 +19,13 @@ export const toJiraDateFromToggl = (dateString) => {
   );
 };
 
-export const mapToJira = (timeLogs) =>
-  timeLogs.map((log) => {
+export const mapToJira = (timeLogs) => {
+  return timeLogs.map((log) => {
     return {
       id: log.id,
       ticket: log.ticket,
       data: {
-        timeSpentSeconds: 64,
+        timeSpentSeconds: log.duration,
         comment: {
           type: "doc",
           version: 1,
@@ -45,3 +45,4 @@ export const mapToJira = (timeLogs) =>
       },
     };
   });
+};
