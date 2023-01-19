@@ -1,4 +1,4 @@
-import { logEntries, logEntry } from "./services/log-entries.js";
+import { logEntries } from "./services/log-entries.js";
 import { mapToJira } from "./utils.js";
 
 export async function Main(services) {
@@ -22,10 +22,10 @@ export async function Main(services) {
 
     await services.Jira.pushLogs(jiraTimeLogs);
 
-    console.log("==== Time logs to sent ====");
+    console.log("==== Time logs sent ====");
     console.table(jiraTimeLogs);
 
-    await logEntries(jiraTimeLogs, services.Arguments.From)
+    await logEntries(jiraTimeLogs, services.Arguments.From);
   }
 }
 
