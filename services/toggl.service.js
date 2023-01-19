@@ -101,7 +101,7 @@ export class TogglService {
 
       return logs
         .filter((value) => {
-          return this.Credentials.toggl.workspaceId === value.workspace_id;
+          return this.Credentials.toggl.workspaceId === value.workspace_id && !value.server_deleted_at;
         })
         .map((value) => {
           let newObj = {};
