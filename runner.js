@@ -18,14 +18,14 @@ export async function Main(services) {
       console.table(reportLogs);
     }
   } else if (timeLogs.length > 0) {
-    // let jiraTimeLogs = mapToJira(timeLogs);
+    let jiraTimeLogs = mapToJira(timeLogs);
 
-    // await services.Jira.pushLogs(jiraTimeLogs);
+    await services.Jira.pushLogs(jiraTimeLogs);
 
-    // console.log("==== Time logs sent ====");
-    // console.table(jiraTimeLogs);
+    console.log("==== Time logs sent ====");
+    console.table(jiraTimeLogs);
 
-    // await logEntries(jiraTimeLogs, services.Arguments.From);
+    await logEntries(jiraTimeLogs, services.Arguments.From);
   }
 }
 
