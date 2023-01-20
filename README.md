@@ -16,6 +16,8 @@ One option of use is that every day the tool is going to send the time logs auto
 1. [Arguments](#arguments)
 1. [Warnings](#warnings)
 1. [Toggl fields](#toggl-fields)
+1. [Automation](#automating)
+    1. [Task Scheduler](#windows-task-scheduler)
  
 
 ## Prerequisite
@@ -167,3 +169,28 @@ LB-550
     "pid": number
 }
 ```
+
+## Automating
+To make it run daily you might add it to your system job runner
+
+> Before setting it up, try running in preview mode to be sure you are happy with what you see. Try `up-time yesterday -p`
+
+### Windows Task Scheduler
+1. Open task scheduler, this should be installed in every windows
+1. Go into the top menu `Action` > `Create Basic Task...`  
+![](misc/task-scheduler/1.%20create%20basic%20task.png)
+1. Give it a easy to remember name, maybe `TogglToJira` is enough and hit `Next`
+1. Set it to run `Daily`, hit `Next`, and follow the steps in the image
+    ![](misc/task-scheduler/3.%20Daily%20time.png)
+    - Set `Start:` for your current date of tomorrow
+    - Set time for `8:00:00 AM`, or what ever time you start working. 
+        - Be sure to avoid to run next to midnight to avoid it the task to run in the wrong day (in case of delay)
+    - You can leave the field `Recur every:` filled with `1` and hit `Next`
+1. For `Action` set `Start a program` and hit `Next`
+1. In `Program/scrip:` ou can write `powershell` and inside `Add arguments (optional):` you can set as bellow:
+    ```
+    -Command " & '<path-to-the-repo>\UpTimeLogs.ps1' yesterday"
+    ```
+1. Done, now you see something similar to this when selecting your new task and navigating to "Actions":
+![](misc/task-scheduler/2.%20Task%20created.png)
+    
