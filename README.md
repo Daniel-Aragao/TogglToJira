@@ -135,7 +135,8 @@ LB-550
 |---|---|
 | -p | Set preview only, don't access Jira |
 | preview=field1,field2 | The same as -p, but allows to add the wanted fields comma separated |
-| date1:date2 | To inform the date filter from date1 to date2. The ':' is not needed then date2 is not sent |
+| date1:date2 | To inform the date filter from date1 to date2. The ':' is not needed when date2 is not sent |
+| date1 | Set date1 as informed and date2 as tomorrow, so it will return everything from date1 until today |
 | today | Set date1 = today's date and date2 as tomorrow, returning only the logs from today |
 | yesterday | Set date1 = yesterday's date and date2 as today, returning only the logs from yesterday |
 
@@ -184,8 +185,8 @@ To make it run daily you might add it to your system job runner
     ![](misc/task-scheduler/3.%20Daily%20time.png)
     - Set `Start:` for your current date of tomorrow
     - Set time for `8:00:00 AM`, or what ever time you start working. 
-        - Be sure to avoid to run next to midnight to avoid it the task to run in the wrong day (in case of delay)
-    - You can leave the field `Recur every:` filled with `1` and hit `Next`
+        - Be sure to avoid to run it next to midnight so the task will not run in the wrong day (in case of delay)
+    - You can fill the field `Recur every:` with `1` and hit `Next`
 1. For `Action` set `Start a program` and hit `Next`
 1. In `Program/scrip:` ou can write `powershell` and inside `Add arguments (optional):` you can set as bellow:
     ```
