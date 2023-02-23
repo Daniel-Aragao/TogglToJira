@@ -11,22 +11,49 @@ export async function Main(services) {
 
   if (services.Arguments.preview.isActive) {
     console.log("==== Time logs to send ====");
-    console.table(timeLogs);
+    console.table(formatLogsDurationToHour(timeLogs));
 
     if (reportLogs.length > 0) {
       console.log("==== Filtered time logs ====");
-      console.table(reportLogs);
+      console.table(formatLogsDurationToSecond(reportLogs));
     }
   } else if (timeLogs.length > 0) {
     let jiraTimeLogs = mapToJira(timeLogs);
 
     await services.Jira.pushLogs(jiraTimeLogs);
-
+    
     console.log("==== Time logs sent ====");
-    console.table(jiraTimeLogs);
-
     await logEntries(jiraTimeLogs, services.Arguments.From);
+    
+    console.table(formatJiraLogsDurationToHour(jiraTimeLogs));
   }
+}
+
+const formatLogsDurationToHour = (timeLogs) => {
+  return timeLogs.map(log => {
+    return {
+      ...log,
+      duration: (log.duration/(60*60)).toFixed(2) + 'h'
+    }
+  });
+}
+
+const formatLogsDurationToSecond = (timeLogs) => {
+  return timeLogs.map(log => {
+    return {
+      ...log,
+      duration: log.duration + 'h'
+    }
+  });
+}
+
+const formatJiraLogsDurationToHour = (timeLogs) => {
+  return timeLogs.map(log => {
+    return {
+      ...log,
+      duration: (log.data.timeSpentSeconds/(60*60)).toFixed(2) + 'h'
+    }
+  });
 }
 
 const filterLogs = (timeLogs, reportLogs) =>
