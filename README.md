@@ -133,12 +133,16 @@ LB-550
 ## Arguments
 | name | description |
 |---|---|
-| -p | Set preview only, don't access Jira |
-| preview=field1,field2 | The same as -p, but allows to add the wanted fields comma separated |
-| date1:date2 | To inform the date filter from date1 to date2. The ':' is not needed when date2 is not sent |
+| `-p` | Set preview only, don't access Jira |
+| `preview=`field1`,`field2 | The same as -p, but allows to add the wanted fields comma separated |
+| date1`:`date2 | To inform the date filter from date1 to date2. The ':' is not needed when date2 is not sent |
 | date1 | Set date1 as informed and date2 as tomorrow, so it will return everything from date1 until today |
-| today | Set date1 = today's date and date2 as tomorrow, returning only the logs from today |
-| yesterday | Set date1 = yesterday's date and date2 as today, returning only the logs from yesterday |
+| `today` | Set date1 = today's date and date2 as tomorrow, returning only the logs from today |
+| `yesterday` | Set date1 = yesterday's date and date2 as today, returning only the logs from yesterday |
+| `from=`date | Set the start date respecting the time [RFC3339](https://www.rfc-editor.org/rfc/rfc3339#page-10) format (`2023-02-28T22:39:00Z`) for GMT (always including Z) |
+| `to=`date | Set the end date respecting the time [RFC3339](https://www.rfc-editor.org/rfc/rfc3339#page-10) format for GMT (always including Z). Ignored in case `from` is not informed |
+| `-pm` / `prevent-merge` | Prevent that items with the same ticket and description are converted to the same log |
+| `-fm` / `full-merge` | Force items with the same ticket been merged in the same log|
 
 ## Warnings
 1. The date is going to be converted to GMT so if you are not aware of your logs try to set preview mode with `-p`

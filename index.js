@@ -16,7 +16,9 @@ let services = {
     Credentials: credentials,
     Arguments: {interval: {From: '', To: ''}, preview: {
         isActive: false,
-        fields: JSON.parse(JSON.stringify(minimumFields))
+        fields: JSON.parse(JSON.stringify(minimumFields)),
+        preventMerge: false,
+        fullMerge: false
     }}
 }
 

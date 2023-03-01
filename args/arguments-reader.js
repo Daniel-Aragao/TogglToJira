@@ -2,7 +2,8 @@ import { toPartialISOString } from "../utils.js";
 import { configToggl } from "./toggl-user.args.js";
 import { configJira } from "./jira-user.args.js";
 
-const dateRegex = /(\d{4}-\d{2}-\d{2})(?::(\d{4}-\d{2}-\d{2}))?/
+const dateRegex = /^(\d{4}-\d{2}-\d{2})(?::(\d{4}-\d{2}-\d{2}))?$/
+const dateTimeRegex = /^(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}Z$/
 
 export async function interpretArgument(value, services) {
     if(value.startsWith('toggl-user')) {
@@ -16,7 +17,19 @@ export async function interpretArgument(value, services) {
         services.Arguments.From = dates[1];
         services.Arguments.To = dates[2];
 
-    } else if(value.startsWith('preview') || value === '-p') {
+    } else if(value.startsWith('from=')) {
+        let from = value.split("=")[1];
+
+        if(dateTimeRegex.test(from)) {
+            services.Arguments.From = dateTimeRegex.exec(from)[0] 
+        }
+    } else if(value.startsWith('to=')) {
+        let to = value.split("=")[1];
+
+        if(dateTimeRegex.test(to)) {
+            services.Arguments.To = dateTimeRegex.exec(to)[0] 
+        }
+    }else if(value.startsWith('preview') || value === '-p') {
         services.Arguments.preview.isActive = true;
         let fields = value.split("=");
 
@@ -36,5 +49,9 @@ export async function interpretArgument(value, services) {
         
         today.setDate(today.getDate() - 1);
         services.Arguments.From = toPartialISOString(today);
+    } else if(value === 'prevent-merge' || value === '-pm') {
+        services.Arguments.preventMerge = true;
+    } else if(value === 'full-merge' || value === '-fm') {
+        services.Arguments.fullMerge = true;
     }
 }

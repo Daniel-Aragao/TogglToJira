@@ -1,5 +1,5 @@
 import { logEntries } from "./services/log-entries.js";
-import { mapToJira } from "./utils.js";
+import { mapToJira, mergeEntries, formatToHour, formatToSeconds } from "./utils.js";
 
 export async function Main(services) {
   let timeLogs = [];
@@ -8,6 +8,10 @@ export async function Main(services) {
   timeLogs = await getLogs(services);
 
   timeLogs = filterLogs(timeLogs, reportLogs);
+
+  if(!services.Arguments.preventMerge) {
+    timeLogs = mergeEntries(timeLogs, services.Arguments.fullMerge);
+  }
 
   if (services.Arguments.preview.isActive) {
     console.log("==== Time logs to send ====");
@@ -18,6 +22,11 @@ export async function Main(services) {
       console.table(formatLogsDurationToSecond(reportLogs));
     }
   } else if (timeLogs.length > 0) {
+
+    if(!services.Arguments.preventMerge) {
+      timeLogs = mergeEntries(timeLogs, services.Arguments.fullMerge);
+    }
+
     let jiraTimeLogs = mapToJira(timeLogs);
 
     await services.Jira.pushLogs(jiraTimeLogs);
@@ -25,35 +34,71 @@ export async function Main(services) {
     console.log("==== Time logs sent ====");
     await logEntries(jiraTimeLogs, services.Arguments.From);
     
-    console.table(formatJiraLogsDurationToHour(jiraTimeLogs));
+    console.table(formatJiraLogs(jiraTimeLogs));
   }
 }
 
 const formatLogsDurationToHour = (timeLogs) => {
-  return timeLogs.map(log => {
+  let total = 0;
+
+  const result = timeLogs.map(log => {
+    total += log.duration;
+
     return {
       ...log,
-      duration: (log.duration/(60*60)).toFixed(2) + 'h'
+      id: formatDescription(log.id.toString()),
+      description: formatDescription(log.description),
+      duration: formatToHour(log.duration)
     }
   });
+
+  result.push({description: "======================== TOTAL ========================", duration: formatToHour(total)})
+  return result;
 }
 
 const formatLogsDurationToSecond = (timeLogs) => {
-  return timeLogs.map(log => {
+  let total = 0;
+
+  const result = timeLogs.map(log => {
+    total += log.duration;
+
     return {
       ...log,
-      duration: log.duration + 'h'
+      id: formatDescription(log.id.toString()),
+      description: formatDescription(log.description),
+      duration: log.duration + 's'
     }
   });
+
+  result.push({description: "======================== TOTAL ========================", duration: formatToSeconds(total)})
+  return result;
 }
 
-const formatJiraLogsDurationToHour = (timeLogs) => {
-  return timeLogs.map(log => {
+const formatJiraLogs = (jiraTimeLogs) => {
+  let total = 0;
+
+  const result =  jiraTimeLogs.map(log => {
+    total += log.data.timeSpentSeconds;
+
     return {
-      ...log,
-      duration: (log.data.timeSpentSeconds/(60*60)).toFixed(2) + 'h'
+      id: formatDescription(log.id.toString()),
+      ticket: log.ticket,
+      description: formatDescription(log.data?.comment?.content?.[0]?.content?.[0]?.text),
+      duration: formatToHour(log.data.timeSpentSeconds)
     }
   });
+
+  result.push({description: "======================== TOTAL ========================", duration: formatToHour(total)})
+  return result;
+}
+
+const formatDescription = (description) => {
+  if(!description) return undefined;
+  if(description.length > 55 ) {
+    return description?.substring(0, 52) + "...";
+  } else {
+    return description?.substring(0, 55);
+  }
 }
 
 const filterLogs = (timeLogs, reportLogs) =>

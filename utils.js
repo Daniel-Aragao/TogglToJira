@@ -8,6 +8,9 @@ export const toUnix = (date) => Math.floor(date.getTime() / 1000);
 
 export const toDateFromISOtoGMT = (dateString) => {
   let date = new Date(dateString);
+  if(dateString.indexOf('T') > 0) {
+    return date;
+  }
   return new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
 };
 export const toPartialISOString = (date) =>
@@ -47,3 +50,27 @@ export const mapToJira = (timeLogs) => {
     };
   });
 };
+
+export const mergeEntries = (timeLogs, fullMerge=false) => {
+  return timeLogs.reduce((previous, currentLog, i) => {
+    let repeated = previous.find((log) => log.ticket === currentLog.ticket && (fullMerge || log.description === currentLog.description));
+
+    if(repeated) {
+      repeated.duration += currentLog.duration;
+      repeated.id += `_${currentLog.id}`;
+      repeated.description += `; ${currentLog.description}`;
+    } else {
+      previous.push({...currentLog});
+    }
+
+    return previous;
+  }, []);
+}
+
+export const formatToHour = (seconds) => {
+  return (seconds/(60*60)).toFixed(2) + 'h';
+}
+
+export const formatToSeconds = (seconds) => {
+  return seconds + 's';
+}

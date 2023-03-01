@@ -13,8 +13,7 @@ export async function logEntry(jiraLog, from) {
   let getDirFunc = jiraLog.uploadedOnJira ? getSuccessDir : getFailDir;
 
   return new Promise((resolve, reject) => {
-    let dir = getDirFunc(from);
-
+    let dir = getDirFunc(from.substring(0, 10));
     let existsDir = fs.existsSync(dir);
 
     if (!existsDir) {
