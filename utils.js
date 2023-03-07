@@ -8,7 +8,7 @@ export const toUnix = (date) => Math.floor(date.getTime() / 1000);
 
 export const toDateFromISOtoGMT = (dateString) => {
   let date = new Date(dateString);
-  if(dateString.indexOf('T') > 0) {
+  if (dateString.indexOf("T") > 0) {
     return date;
   }
   return new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
@@ -51,26 +51,32 @@ export const mapToJira = (timeLogs) => {
   });
 };
 
-export const mergeEntries = (timeLogs, fullMerge=false) => {
+export const mergeEntries = (timeLogs, fullMerge = false) => {
   return timeLogs.reduce((previous, currentLog, i) => {
-    let repeated = previous.find((log) => log.ticket === currentLog.ticket && (fullMerge || log.description === currentLog.description));
+    let repeated = previous.find((log) => {
+      const hasSameTicket = log.ticket === currentLog.ticket;
+      const hasDescription =
+        log.description.split(";").indexOf(currentLog.description) >= 0;
 
-    if(repeated) {
+      return hasSameTicket && (fullMerge || hasDescription);
+    });
+
+    if (repeated) {
       repeated.duration += currentLog.duration;
       repeated.id += `_${currentLog.id}`;
       repeated.description += `; ${currentLog.description}`;
     } else {
-      previous.push({...currentLog});
+      previous.push({ ...currentLog });
     }
 
     return previous;
   }, []);
-}
+};
 
 export const formatToHour = (seconds) => {
-  return (seconds/(60*60)).toFixed(2) + 'h';
-}
+  return (seconds / (60 * 60)).toFixed(2) + "h";
+};
 
 export const formatToSeconds = (seconds) => {
-  return seconds + 's';
-}
+  return seconds + "s";
+};

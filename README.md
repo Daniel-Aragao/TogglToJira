@@ -133,8 +133,7 @@ LB-550
 ## Arguments
 | name | description |
 |---|---|
-| `-p` | Set preview only, don't access Jira |
-| `preview=`field1`,`field2 | The same as -p, but allows to add the wanted fields comma separated |
+| `-p` / `push` | Send data to Jira |
 | date1`:`date2 | To inform the date filter from date1 to date2. The ':' is not needed when date2 is not sent |
 | date1 | Set date1 as informed and date2 as tomorrow, so it will return everything from date1 until today |
 | `today` | Set date1 = today's date and date2 as tomorrow, returning only the logs from today |

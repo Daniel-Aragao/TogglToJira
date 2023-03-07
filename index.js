@@ -14,12 +14,15 @@ let services = {
     Toggl: new TogglService(defaultConfig, credentials),
     Jira: new JiraService(defaultConfig, credentials),
     Credentials: credentials,
-    Arguments: {interval: {From: '', To: ''}, preview: {
-        isActive: false,
-        fields: JSON.parse(JSON.stringify(minimumFields)),
+    Arguments: {
+        interval: {From: '', To: ''}, 
+        preview: {
+            isActive: true,
+            fields: JSON.parse(JSON.stringify(minimumFields)),
+        },
         preventMerge: false,
         fullMerge: false
-    }}
+    }
 }
 
 let promises = [];

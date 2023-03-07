@@ -29,13 +29,13 @@ export async function interpretArgument(value, services) {
         if(dateTimeRegex.test(to)) {
             services.Arguments.To = dateTimeRegex.exec(to)[0] 
         }
-    }else if(value.startsWith('preview') || value === '-p') {
-        services.Arguments.preview.isActive = true;
-        let fields = value.split("=");
+    }else if(value.startsWith('push') || value === '-p') {
+        services.Arguments.preview.isActive = false;
+        // let fields = value.split("=");
 
-        if(fields.length > 1) {
-            services.Arguments.preview.fields = fields[1].split(',');
-        }
+        // if(fields.length > 1) {
+        //     services.Arguments.preview.fields = fields[1].split(',');
+        // }
 
     } else if(value === 'today') {
         let today = new Date();

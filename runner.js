@@ -29,7 +29,7 @@ export async function Main(services) {
 
     let jiraTimeLogs = mapToJira(timeLogs);
 
-    await services.Jira.pushLogs(jiraTimeLogs);
+    // await services.Jira.pushLogs(jiraTimeLogs);
     
     console.log("==== Time logs sent ====");
     await logEntries(jiraTimeLogs, services.Arguments.From);
