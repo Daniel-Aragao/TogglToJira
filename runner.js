@@ -31,10 +31,15 @@ export async function Main(services) {
 
     await services.Jira.pushLogs(jiraTimeLogs);
     
+    const sent = jiraTimeLogs.filter(jiraLogs => jiraLogs.uploadedOnJira);
+    const notSent = jiraTimeLogs.filter(jiraLogs => !jiraLogs.uploadedOnJira);
+
     console.log("==== Time logs sent ====");
-    console.table(formatJiraLogs(jiraTimeLogs));
-    await logEntries(jiraTimeLogs, services.Arguments.From);
+    console.table(formatJiraLogs(sent));
+    console.log("==== Time logs not sent ====");
+    console.table(formatJiraLogs(notSent));
     
+    await logEntries(jiraTimeLogs, services.Arguments.From);
   }
 }
 
@@ -60,17 +65,20 @@ const formatLogsDurationToSecond = (timeLogs) => {
   let total = 0;
 
   const result = timeLogs.map(log => {
+    if(log.duration < 0) {
+      log.duration = Math.floor((new Date() - new Date(log.start)) / 1000)
+    }
     total += log.duration;
 
     return {
       ...log,
       id: formatDescription(log.id.toString()),
       description: formatDescription(log.description),
-      duration: log.duration + 's'
+      duration: `${log.duration}s (${formatToHour(log.duration)})`
     }
   });
 
-  result.push({description: "======================== TOTAL ========================", duration: formatToSeconds(total)})
+  result.push({description: "======================== TOTAL ========================", duration: `${formatToSeconds(total)}(${formatToHour(total)})`})
   return result;
 }
 
@@ -103,9 +111,19 @@ const formatDescription = (description) => {
 
 const filterLogs = (timeLogs, reportLogs) =>
   timeLogs.filter((log) => {
-    let isApproved = !!log.ticket && log.duration >= 60;
+    const hasTicket = !!log.ticket;
+    const isInProgress = log.duration < 0;
+    const hasMinimumDurations = log.duration >= 60;
+    let isApproved = hasTicket && hasMinimumDurations;
 
     if (!isApproved) {
+      log.currentStatus = [];
+      !hasTicket && log.currentStatus.push('No ticket');
+      isInProgress && log.currentStatus.push('In progress');
+      !isInProgress && !hasMinimumDurations && log.currentStatus.push('Less than a minute');
+
+      log.currentStatus = log.currentStatus.join(", ");
+
       reportLogs.push(log);
     }
 
