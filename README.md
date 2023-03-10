@@ -138,6 +138,7 @@ LB-550
 | date1 | Set date1 as informed and date2 as tomorrow, so it will return everything from date1 until today |
 | `today` | Set date1 = today's date and date2 as tomorrow, returning only the logs from today |
 | `yesterday` | Set date1 = yesterday's date and date2 as today, returning only the logs from yesterday |
+| `week` | Set date1 = this week's sunday date and date2 as next week's sunday, returning only the logs from this week |
 | `from=`date | Set the start date respecting the time [RFC3339](https://www.rfc-editor.org/rfc/rfc3339#page-10) format (`2023-02-28T22:39:00Z`) for GMT (always including Z) |
 | `to=`date | Set the end date respecting the time [RFC3339](https://www.rfc-editor.org/rfc/rfc3339#page-10) format for GMT (always including Z). Ignored in case `from` is not informed |
 | `-pm` / `prevent-merge` | Prevent that items with the same ticket and description are converted to the same log |

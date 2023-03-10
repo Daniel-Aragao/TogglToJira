@@ -53,5 +53,14 @@ export async function interpretArgument(value, services) {
         services.Arguments.preventMerge = true;
     } else if(value === 'full-merge' || value === '-fm') {
         services.Arguments.fullMerge = true;
+    } else if(value === 'week') {
+        let today = new Date();
+        let sunday = new Date(today);
+        let saturday = new Date(today);
+        sunday.setDate(sunday.getDate() - sunday.getDay());
+        saturday.setDate(saturday.getDate() + (7 - saturday.getDay()));
+
+        services.Arguments.From = toPartialISOString(sunday);
+        services.Arguments.To = toPartialISOString(saturday);
     }
 }
