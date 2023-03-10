@@ -21,7 +21,8 @@ let services = {
             fields: JSON.parse(JSON.stringify(minimumFields)),
         },
         preventMerge: false,
-        fullMerge: false
+        fullMerge: false,
+        formatting: true
     }
 }
 

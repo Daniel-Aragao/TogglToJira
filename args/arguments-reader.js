@@ -62,5 +62,7 @@ export async function interpretArgument(value, services) {
 
         services.Arguments.From = toPartialISOString(sunday);
         services.Arguments.To = toPartialISOString(saturday);
+    } else if(value === 'clean-formatting' || value === '-c') {
+        services.Arguments.formatting = false;
     }
 }

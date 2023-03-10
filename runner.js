@@ -15,8 +15,10 @@ import {
   CONSOLE_COLOR_FgRed as Red,
   CONSOLE_COLOR_Underscore as Underscore,
 } from "./constants.js";
+import { Log } from "./services/logger.js";
 
 export async function Main(services) {
+  const log = Log(!services.Arguments.formatting)
   let timeLogs = [];
   let reportLogs = [];
 
@@ -29,26 +31,26 @@ export async function Main(services) {
   }
 
   if (services.Arguments.preview.isActive) {
-    console.log(
+    log(
       `${marker} Period from ${paint(
         Green,
         services.Arguments.From
       )} to ${paint(Green, services.Arguments.To)} ${marker}`
     );
-    console.log(
+    log(
       `${marker} Time logs ${paint(Underscore, "to send")} ${marker}`
     );
     let { logs, total } = formatLogsDurationToHour(timeLogs);
     console.table(logs);
 
     if (reportLogs.length > 0) {
-      console.log(`${marker} Filtered time logs ${marker}`);
+      log(`${marker} Filtered time logs ${marker}`);
       let reported = formatLogsDurationToSecond(reportLogs);
       console.table(reported.logs);
       total += reported.total;
     }
 
-    console.log(
+    log(
       `${marker} Total worked hours ${paint(
         Green,
         toDuration(total)
@@ -66,9 +68,9 @@ export async function Main(services) {
     const sent = jiraTimeLogs.filter((jiraLogs) => jiraLogs.uploadedOnJira);
     const notSent = jiraTimeLogs.filter((jiraLogs) => !jiraLogs.uploadedOnJira);
 
-    console.log(`${marker} Time logs ${paint(Underscore, "sent")} ${marker}`);
+    log(`${marker} Time logs ${paint(Underscore, "sent")} ${marker}`);
     console.table(formatJiraLogs(sent));
-    console.log(`${marker} Time logs ${paint(Red, "not")} sent ${marker}`);
+    log(`${marker} Time logs ${paint(Red, "not")} sent ${marker}`);
     console.table(formatJiraLogs(notSent));
 
     await logEntries(jiraTimeLogs, services.Arguments.From);
