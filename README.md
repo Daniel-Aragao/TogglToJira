@@ -84,7 +84,8 @@ Example: if you run twice the `toggl-user` command the last information will pre
 
 
 ## Run
-### From a date (Since the given date)
+### From a specific date
+Every log for the informed day
 ```
 up-time 2023-01-06
 ```
@@ -93,7 +94,7 @@ up-time 2023-01-06
 ```
 up-time 2023-01-06:2023-01-17
 ```
-> If the dates are equal the results will be empty
+> The second day is exclusive, if the dates are equal the results will be empty
 
 ### To push to Jira
 ```
@@ -137,7 +138,7 @@ LB-550
 |---|---|
 | `-p` / `push` | Send data to Jira |
 | date1`:`date2 | To inform the date filter from date1 to date2. The ':' is not needed when date2 is not sent |
-| date1 | Set date1 as informed and date2 as tomorrow, so it will return everything from date1 until today |
+| date1 | Set date1 as informed and date2 as one day after date1, so it will return every log from date1 only |
 | `today` | Shortcut to set date1 = today's date and date2 as tomorrow, returning only the logs from today |
 | `yesterday` | Shortcut to set date1 = yesterday's date and date2 as today, returning only the logs from yesterday |
 | `week` | Shortcut to set date1 = this week's sunday date and date2 as next week's sunday, returning only the logs from this week |

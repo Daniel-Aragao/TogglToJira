@@ -1,4 +1,4 @@
-import { toPartialISOString } from "../utils.js";
+import { toPartialISOString, toDateFromISOtoGMT } from "../utils.js";
 import { configToggl } from "./toggl-user.args.js";
 import { configJira } from "./jira-user.args.js";
 
@@ -16,6 +16,11 @@ export async function interpretArgument(value, services) {
         let dates = dateRegex.exec(value);
         services.Arguments.From = dates[1];
         services.Arguments.To = dates[2];
+
+        if(!services.Arguments.To) {
+            let fromDate = toDateFromISOtoGMT(dates[1]);
+            services.Arguments.To = toPartialISOString(new Date(fromDate.setDate(fromDate.getDate() + 1)));
+        }
 
     } else if(value.startsWith('from=')) {
         let from = value.split("=")[1];
