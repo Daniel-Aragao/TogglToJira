@@ -14,6 +14,7 @@ import {
   CONSOLE_COLOR_FgGreen as Green,
   CONSOLE_COLOR_FgRed as Red,
   CONSOLE_COLOR_Underscore as Underscore,
+  CONSOLE_COLOR_FgYellow,
 } from "./constants.js";
 import { Log } from "./services/logger.js";
 
@@ -21,6 +22,14 @@ export async function Main(services) {
   const log = Log(!services.Arguments.formatting)
   let timeLogs = [];
   let reportLogs = [];
+
+  if(!services.Arguments.From){
+    throw new Error(`Main => Argument '${paint(CONSOLE_COLOR_FgYellow, 'From')}' can't be undefined, check if ` +
+    `the the value follows the intended pattern in the documentation section ` +
+    `for '${paint(CONSOLE_COLOR_FgYellow, 'date1')}', '${paint(CONSOLE_COLOR_FgYellow, 'from=')}' dates or `+
+    `'${paint(CONSOLE_COLOR_FgYellow, 'today')}', '${paint(CONSOLE_COLOR_FgYellow, 'yesterday')}' and `+
+    `'${paint(CONSOLE_COLOR_FgYellow, 'week')}' shortcuts`);
+  }
 
   timeLogs = await getLogs(services);
 
