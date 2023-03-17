@@ -26,8 +26,10 @@ One option of use is that every day the tool is going to send the time logs auto
 
 ## Installing
 1. To begin with run `npm i` in the root of the project.
-1. Add [Toggl](#toggl-credentials) and [Jira](#jira-credentials) credentials
-1. Your are good to go
+2. Set alias [up-time](#running-from-any-directory)
+> If the alias is not set, you may call the application through it's root folder running `node <path-to-root-folder>/index.js` instead of using `up-time`
+3. Add [Toggl](#toggl-credentials) and [Jira](#jira-credentials) credentials
+4. You are good to go
 
 ## Running from any directory
 If you want to call it directly:
@@ -75,7 +77,7 @@ up-time toggl-user=email:password
 ```
 up-time jira-user=email:api_token
 ```
->To get Jira api_token access the [Atlassian tutorial](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)
+> To get Jira api_token access the [Atlassian tutorial](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)
 
 The credentials might be run separately but be aware that the `config/credentials.json` file will be overridden for the respective credentials been setup.  
 Example: if you run twice the `toggl-user` command the last information will prevail. If you change the properties manually, be aware not to run the `toggl-user` command again
@@ -93,17 +95,17 @@ up-time 2023-01-06:2023-01-17
 ```
 > If the dates are equal the results will be empty
 
-### To preview only
+### To push to Jira
 ```
 up-time 2023-01-06:2023-01-17 -p
 ```
-> This will prevent the data to be sent to Jira. Strongly recommended before uploading
-
+> Before sending the argument `-p` is good practice to see what are you trying to push to Jira. Strongly recommended before uploading
+<!-- 
 ### To preview only selecting [fields](#toggl-fields)
 ```
 up-time 2023-01-06:2023-01-17 preview=workspace_id,start,stop
 ```
-> The fields `id`, `ticket`, `description`, `duration` and `start` will always be returned  
+> The fields `id`, `ticket`, `description`, `duration` and `start` will always be returned   -->
 
 ## Jira mapping
 The field `ticket` is extracted from the description using regex, this will be used to map the ticket on `Jira` 
@@ -178,7 +180,7 @@ LB-550
 ## Automating
 To make it run daily you might add it to your system job runner
 
-> Before setting it up, try running in preview mode to be sure you are happy with what you see. Try `up-time yesterday -p`
+> Before setting it up, try running in preview mode to be sure you are happy with what you see. Try `up-time yesterday`
 
 ### Windows Task Scheduler
 1. Open task scheduler, this should be installed in every windows
