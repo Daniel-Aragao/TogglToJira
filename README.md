@@ -185,7 +185,7 @@ To make it run daily you might add it to your system job runner
 1. Go into the top menu `Action` > `Create Basic Task...`  
 ![](misc/task-scheduler/1.%20create%20basic%20task.png)
 1. Give it a easy to remember name, maybe `TogglToJira` is enough and hit `Next`
-1. Set it to run `Daily`, hit `Next`, and follow the steps in the image
+1. Set it to run `Daily`, hit `Next`, and follow the steps in the image  
     ![](misc/task-scheduler/3.%20Daily%20time.png)
     - Set `Start:` for your current date of tomorrow
     - Set time for `8:00:00 AM`, or what ever time you start working. 
@@ -196,6 +196,6 @@ To make it run daily you might add it to your system job runner
     ```
     -Command " & '<path-to-the-repo>\UpTimeLogs.ps1' yesterday"
     ```
-1. Done, now you see something similar to this when selecting your new task and navigating to "Actions":
+1. Done, now you see something similar to this when selecting your new task and navigating to "Actions":  
 ![](misc/task-scheduler/2.%20Task%20created.png)
     
