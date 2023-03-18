@@ -19,10 +19,12 @@ let services = {
         preview: {
             isActive: true,
             fields: JSON.parse(JSON.stringify(minimumFields)),
+            groupByDay: false,
+            week: undefined
         },
         preventMerge: false,
         fullMerge: false,
-        formatting: true
+        formatting: true,
     }
 }
 
@@ -35,7 +37,15 @@ process.argv.forEach((val, index) => {
 
 Promise.all(promises).then(async () => {
     services.Toggl.validService();
-    services.Jira.validService();
+    
+    if(!services.Arguments.From){
+        throw new Error(`Main => Argument '${paint(CONSOLE_COLOR_FgYellow, 'From')}' can't be undefined, check if ` +
+        `the the value follows the intended pattern in the documentation section ` +
+        `for '${paint(CONSOLE_COLOR_FgYellow, 'date1')}', '${paint(CONSOLE_COLOR_FgYellow, 'from=')}' dates or `+
+        `'${paint(CONSOLE_COLOR_FgYellow, 'today')}', '${paint(CONSOLE_COLOR_FgYellow, 'yesterday')}' and `+
+        `'${paint(CONSOLE_COLOR_FgYellow, 'week')}' shortcuts`);
+      }
+
     await Main(services);
 }).catch(e => {
     e.cause ? console.error(e.cause) : console.error(e);

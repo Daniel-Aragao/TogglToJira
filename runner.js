@@ -7,6 +7,8 @@ import {
   formatLogsDurationToSecond,
   formatJiraLogs,
   filterLogs,
+  groupByDay,
+  formatToHour
 } from "./utils.js";
 import {
   paint,
@@ -15,75 +17,132 @@ import {
   CONSOLE_COLOR_FgRed as Red,
   CONSOLE_COLOR_Underscore as Underscore,
   CONSOLE_COLOR_FgYellow,
+  spacer,
+  cleanColors,
 } from "./constants.js";
 import { Log } from "./services/logger.js";
 
 export async function Main(services) {
   const log = Log(!services.Arguments.formatting)
   let timeLogs = [];
-  let reportLogs = [];
-
-  if(!services.Arguments.From){
-    throw new Error(`Main => Argument '${paint(CONSOLE_COLOR_FgYellow, 'From')}' can't be undefined, check if ` +
-    `the the value follows the intended pattern in the documentation section ` +
-    `for '${paint(CONSOLE_COLOR_FgYellow, 'date1')}', '${paint(CONSOLE_COLOR_FgYellow, 'from=')}' dates or `+
-    `'${paint(CONSOLE_COLOR_FgYellow, 'today')}', '${paint(CONSOLE_COLOR_FgYellow, 'yesterday')}' and `+
-    `'${paint(CONSOLE_COLOR_FgYellow, 'week')}' shortcuts`);
-  }
 
   timeLogs = await getLogs(services);
 
-  timeLogs = filterLogs(timeLogs, reportLogs);
-
-  if (!services.Arguments.preventMerge) {
-    timeLogs = mergeEntries(timeLogs, services.Arguments.fullMerge);
-  }
-
+  // Preview
   if (services.Arguments.preview.isActive) {
-    log(
-      `${marker} Period from ${paint(
-        Green,
-        services.Arguments.From
-      )} to ${paint(Green, services.Arguments.To)} ${marker}`
-    );
-    log(
-      `${marker} Time logs ${paint(Underscore, "to send")} ${marker}`
-    );
-    let { logs, total } = formatLogsDurationToHour(timeLogs);
-    console.table(logs);
+    let total = 0;
+    
+    if(services.Arguments.preview.groupByDay) {
+      let timeLogsByDay = groupByDay(timeLogs);
 
-    if (reportLogs.length > 0) {
-      log(`${marker} Filtered time logs ${marker}`);
-      let reported = formatLogsDurationToSecond(reportLogs);
-      console.table(reported.logs);
-      total += reported.total;
+      if(services.Arguments.preview.week) {
+        let head1 = `Week ${paint(Green, services.Arguments.preview.week[1])} `;
+        
+        log(`${marker}${spacer(head1, 46)}${marker}`)
+      }
+      
+      let head = `From ${paint(Green, services.Arguments.From)} To ${paint(Green, services.Arguments.To)}`;
+
+      log(`${marker}${spacer(head, 46)}${marker}`)
+
+      timeLogsByDay.forEach(group => {
+        let reportLogs = [];
+        let timeLogsPerDay = filterLogs(group.timeLogs, reportLogs);
+
+        total += previewSingleLine(group.day, timeLogsPerDay, reportLogs, log)
+      })
+    } else {
+      let reportLogs = [];
+    
+      timeLogs = filterLogs(timeLogs, reportLogs);
+
+      if (!services.Arguments.preventMerge) {
+        timeLogs = mergeEntries(timeLogs, services.Arguments.fullMerge);
+      }
+
+      total = preview(services.Arguments.From, services.Arguments.To, timeLogs, reportLogs, log)
     }
 
-    log(
-      `${marker} Total worked hours ${paint(
-        Green,
-        toDuration(total)
-      )} ${marker}`
-    );
-  } else if (timeLogs.length > 0) {
-    if (!services.Arguments.preventMerge) {
-      timeLogs = mergeEntries(timeLogs, services.Arguments.fullMerge);
+    let foot = ` Total worked hours ${paint(Green, toDuration(total))}`;
+    log(`${marker}${spacer(foot, 46, 'end')}${marker}`);
+  } else {
+    // Push
+    timeLogs = filterLogs(timeLogs);
+
+    if (timeLogs.length > 0) {
+      services.Jira.validService();
+  
+      if (!services.Arguments.preventMerge) {
+        timeLogs = mergeEntries(timeLogs, services.Arguments.fullMerge);
+      }
+  
+      let jiraTimeLogs = mapToJira(timeLogs);
+  
+      await services.Jira.pushLogs(jiraTimeLogs);
+  
+      const sent = jiraTimeLogs.filter((jiraLogs) => jiraLogs.uploadedOnJira);
+      const notSent = jiraTimeLogs.filter((jiraLogs) => !jiraLogs.uploadedOnJira);
+  
+      log(`${marker} Time logs ${paint(Underscore, "sent")} ${marker}`);
+      console.table(formatJiraLogs(sent));
+      log(`${marker} Time logs ${paint(Red, "not")} sent ${marker}`);
+      console.table(formatJiraLogs(notSent));
+  
+      await logEntries(jiraTimeLogs, services.Arguments.From);
     }
-
-    let jiraTimeLogs = mapToJira(timeLogs);
-
-    await services.Jira.pushLogs(jiraTimeLogs);
-
-    const sent = jiraTimeLogs.filter((jiraLogs) => jiraLogs.uploadedOnJira);
-    const notSent = jiraTimeLogs.filter((jiraLogs) => !jiraLogs.uploadedOnJira);
-
-    log(`${marker} Time logs ${paint(Underscore, "sent")} ${marker}`);
-    console.table(formatJiraLogs(sent));
-    log(`${marker} Time logs ${paint(Red, "not")} sent ${marker}`);
-    console.table(formatJiraLogs(notSent));
-
-    await logEntries(jiraTimeLogs, services.Arguments.From);
   }
+}
+
+function preview(from, to, timeLogs, reportLogs, log) {
+  log(
+    `${marker} Period from ${paint(
+      Green,
+      from
+    )} to ${paint(Green, to)} ${marker}`
+  );
+  log(
+    `${marker} Time logs ${paint(Underscore, "to send")} ${marker}`
+  );
+
+  let { logs, total } = formatLogsDurationToHour(timeLogs);
+
+  console.table(logs);
+
+  if (reportLogs.length > 0) {
+    log(`${marker} Filtered time logs ${marker}`);
+
+    let reported = formatLogsDurationToSecond(reportLogs);
+
+    console.table(reported.logs);
+
+    total += reported.total;
+  }
+
+  return total;
+}
+
+function previewSingleLine(from, timeLogs, reportLogs, log) {
+  let { total, totalFormatted } = formatLogsDurationToHour(timeLogs);
+  
+  let text = `${marker} Date ${paint(
+    Green,
+    from
+  )} ${marker} ${totalFormatted}`
+
+  if (reportLogs.length > 0) {
+    
+    let reported = formatLogsDurationToSecond(reportLogs);
+
+    total += reported.total;
+
+    text += ` + ${formatToHour(reported.total)}`
+  } else {
+    text += ''.padStart(9, ' ');
+  }
+
+  log(`${text} = ${formatToHour(total)} ${marker}`);
+
+  return total;
 }
 
 async function getLogs(services) {

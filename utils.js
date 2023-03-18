@@ -14,7 +14,7 @@ export const toDateFromISOtoGMT = (dateString) => {
   return new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
 };
 export const toPartialISOString = (date) =>
-  `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+  `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${(date.getDate()).toString().padStart(2, '0')}`;
 
 export const toJiraDateFromToggl = (dateString) => {
   let splitedDateString = dateString.split("+");
@@ -74,7 +74,7 @@ export const mergeEntries = (timeLogs, fullMerge = false) => {
 };
 
 export const formatToHour = (seconds) => {
-  return (seconds / (60 * 60)).toFixed(2) + "h";
+  return ((seconds / (60 * 60)).toFixed(2) + "h").padStart(6, '0');
 };
 
 export const formatToSeconds = (seconds) => {
@@ -103,8 +103,10 @@ export const formatLogsDurationToHour = (timeLogs) => {
     }
   });
 
-  result.push({description: "======================== TOTAL ========================", duration: formatToHour(total)})
-  return {logs: result, total: total};
+  let totalFormatted = formatToHour(total);
+
+  result.push({description: "======================== TOTAL ========================", duration: totalFormatted})
+  return {logs: result, total: total, totalFormatted: totalFormatted};
 }
 
 export const formatLogsDurationToSecond = (timeLogs) => {
@@ -124,8 +126,10 @@ export const formatLogsDurationToSecond = (timeLogs) => {
     }
   });
 
-  result.push({description: "======================== TOTAL ========================", duration: `${formatToSeconds(total)}(${formatToHour(total)})`})
-  return {logs: result, total: total};
+  let totalFormatted = `${formatToSeconds(total)}(${formatToHour(total)})`;
+
+  result.push({description: "======================== TOTAL ========================", duration: totalFormatted})
+  return {logs: result, total: total, totalFormatted: totalFormatted};
 }
 
 export const formatJiraLogs = (jiraTimeLogs) => {
@@ -154,7 +158,12 @@ const formatDescription = (description) => {
     return description?.substring(0, 55);
   }
 }
-
+/**
+ * Receive the time logs array to be pushed in the report logs array
+ * @param {timelog[]} timeLogs The time logs from Toggl to be filtered
+ * @param {repotLogs[]} reportLogs Will save the filtered logs output
+ * @returns 
+ */
 export const filterLogs = (timeLogs, reportLogs) =>
   timeLogs.filter((log) => {
     const hasTicket = !!log.ticket;
@@ -170,8 +179,63 @@ export const filterLogs = (timeLogs, reportLogs) =>
 
       log.currentStatus = log.currentStatus.join(", ");
 
-      reportLogs.push(log);
+      reportLogs?.push(log);
     }
 
     return isApproved;
   });
+
+export const groupByDay = (timeLogs) => {
+  const timeLogsByDay = timeLogs.reduce((prev, current) => {
+    const day = current.start.split('T')[0];
+    
+    if(!prev[day]) {
+      prev[day] = [];
+    }
+    
+    prev[day].push(current);
+
+    return prev;
+  }, {});
+
+  let list = [];
+
+  for(let day in timeLogsByDay) {
+    list.push({day: day, timeLogs: timeLogsByDay[day], order: new Date(day).getTime() });
+  }
+
+  list.sort((itemA, itemB) => itemA.order - itemB.order);
+
+  return list;
+}
+
+/* For a given date, get the ISO week number
+ *
+ * Based on information at:
+ *
+ *    THIS PAGE (DOMAIN EVEN) DOESN'T EXIST ANYMORE UNFORTUNATELY
+ *    http://www.merlyn.demon.co.uk/weekcalc.htm#WNR
+ *
+ * Algorithm is to find nearest thursday, it's year
+ * is the year of the week number. Then get weeks
+ * between that date and the first day of that year.
+ *
+ * Note that dates in one year can be weeks of previous
+ * or next year, overlap is up to 3 days.
+ *
+ * e.g. 2014/12/29 is Monday in week  1 of 2015
+ *      2012/1/1   is Sunday in week 52 of 2011
+ */
+export function getWeekNumber(date) {
+  // Copy date so don't modify original
+  date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  // Set to nearest Thursday: current date + 4 - current day number
+  // Make Sunday's day number 7
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay()||7));
+  // Get first day of year
+  var yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  // Calculate full weeks to nearest Thursday
+  var weekNo = Math.ceil(( ( (date - yearStart) / 86400000) + 1)/7);
+  // Return array of year and week number
+  return [date.getUTCFullYear(), weekNo];
+}

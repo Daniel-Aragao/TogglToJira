@@ -1,4 +1,4 @@
-import { toPartialISOString, toDateFromISOtoGMT } from "../utils.js";
+import { toPartialISOString, toDateFromISOtoGMT, getWeekNumber } from "../utils.js";
 import { configToggl } from "./toggl-user.args.js";
 import { configJira } from "./jira-user.args.js";
 
@@ -67,6 +67,11 @@ export async function interpretArgument(value, services) {
 
         services.Arguments.From = toPartialISOString(sunday);
         services.Arguments.To = toPartialISOString(saturday);
+        services.Arguments.preview.groupByDay = true;
+        services.Arguments.preview.week  = getWeekNumber(today);
+    } else if(value === '-by-day'){
+        services.Arguments.preview.groupByDay = true;
+
     } else if(value === 'clean-formatting' || value === '-c') {
         services.Arguments.formatting = false;
     }
