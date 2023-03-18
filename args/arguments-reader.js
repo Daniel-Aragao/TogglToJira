@@ -1,9 +1,10 @@
-import { toPartialISOString, toDateFromISOtoGMT, getWeekNumber } from "../utils.js";
+import { toPartialISOString, toDateFromISOtoGMT, getWeekNumber, getDateOfWeek } from "../utils.js";
 import { configToggl } from "./toggl-user.args.js";
 import { configJira } from "./jira-user.args.js";
 
 const dateRegex = /^(\d{4}-\d{2}-\d{2})(?::(\d{4}-\d{2}-\d{2}))?$/
 const dateTimeRegex = /^(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}Z$/
+const weekNumberRegex = /^week(?:=(\d{1,2}))?$/
 
 export async function interpretArgument(value, services) {
     if(value.startsWith('toggl-user')) {
@@ -58,17 +59,27 @@ export async function interpretArgument(value, services) {
         services.Arguments.preventMerge = true;
     } else if(value === 'full-merge' || value === '-fm') {
         services.Arguments.fullMerge = true;
-    } else if(value === 'week') {
+    } else if(weekNumberRegex.test(value)) {
+        let weekN = Number(weekNumberRegex.exec(value)[1]);
+
         let today = new Date();
         let sunday = new Date(today);
-        let saturday = new Date(today);
-        sunday.setDate(sunday.getDate() - sunday.getDay());
-        saturday.setDate(saturday.getDate() + (7 - saturday.getDay()));
+        let saturdayInclusive = new Date(today);
+        
+        if(weekN) {
+            sunday = getDateOfWeek(weekN);
+            saturdayInclusive = new Date(sunday);
+            saturdayInclusive.setDate(saturdayInclusive.getDate() + 7 );
+
+        } else {
+            sunday.setDate(sunday.getDate() - sunday.getDay());
+            saturdayInclusive.setDate(saturdayInclusive.getDate() + (7 - saturdayInclusive.getDay()));
+        }
 
         services.Arguments.From = toPartialISOString(sunday);
-        services.Arguments.To = toPartialISOString(saturday);
+        services.Arguments.To = toPartialISOString(saturdayInclusive);
         services.Arguments.preview.groupByDay = true;
-        services.Arguments.preview.week  = getWeekNumber(today);
+        services.Arguments.preview.week = weekN || getWeekNumber(sunday);
     } else if(value === '-by-day'){
         services.Arguments.preview.groupByDay = true;
 

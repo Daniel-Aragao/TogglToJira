@@ -228,7 +228,8 @@ export const groupByDay = (timeLogs) => {
  */
 export function getWeekNumber(date) {
   // Copy date so don't modify original
-  date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  // date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  date = new Date(date);
   // Set to nearest Thursday: current date + 4 - current day number
   // Make Sunday's day number 7
   date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay()||7));
@@ -237,5 +238,16 @@ export function getWeekNumber(date) {
   // Calculate full weeks to nearest Thursday
   var weekNo = Math.ceil(( ( (date - yearStart) / 86400000) + 1)/7);
   // Return array of year and week number
-  return [date.getUTCFullYear(), weekNo];
+  return weekNo;
+}
+
+/**
+ * Get date by week number
+ * @param {int} w Week number
+ * @returns 
+ */
+export function getDateOfWeek(w) {
+  var d = (1 + (w - 1) * 7); // 1st of January + 7 days for each week
+
+  return new Date(new Date().getFullYear(), 0, d);
 }

@@ -36,7 +36,7 @@ export async function Main(services) {
       let timeLogsByDay = groupByDay(timeLogs);
 
       if(services.Arguments.preview.week) {
-        let head1 = `Week ${paint(Green, services.Arguments.preview.week[1])} `;
+        let head1 = `Week ${paint(Green, services.Arguments.preview.week)} `;
         
         log(`${marker}${spacer(head1, 46)}${marker}`)
       }
