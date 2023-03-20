@@ -213,9 +213,6 @@ export const groupByDay = (timeLogs) => {
  *
  * Based on information at:
  *
- *    THIS PAGE (DOMAIN EVEN) DOESN'T EXIST ANYMORE UNFORTUNATELY
- *    http://www.merlyn.demon.co.uk/weekcalc.htm#WNR
- *
  * Algorithm is to find nearest thursday, it's year
  * is the year of the week number. Then get weeks
  * between that date and the first day of that year.
@@ -230,13 +227,14 @@ export function getWeekNumber(date) {
   // Copy date so don't modify original
   // date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   date = new Date(date);
-  // Set to nearest Thursday: current date + 4 - current day number
-  // Make Sunday's day number 7
-  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay()||7));
+  // Set sunday
+  date.setDate(date.getDate() - date.getDay());
   // Get first day of year
-  var yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-  // Calculate full weeks to nearest Thursday
-  var weekNo = Math.ceil(( ( (date - yearStart) / 86400000) + 1)/7);
+  var yearStart = new Date(date.getFullYear(), 0, 1);
+  // Set sunday
+  yearStart.setDate(yearStart.getDate() - yearStart.getDay());
+  // Calculate full weeks
+  var weekNo = Math.ceil((((date - yearStart) / 86400000)) / 7);
   // Return array of year and week number
   return weekNo;
 }
