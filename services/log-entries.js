@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { cleanColors } from "../constants.js";
 import { __dirname } from "../utils.js";
 
 const getFileName = (dir, file) => path.join(dir, `${file}.json`);
@@ -68,7 +69,7 @@ export function exceptionLog(exception) {
 
     fs.appendFileSync(
       path.join(dir, "Exceptions.txt"),
-      data ?? "Fail to parse log"
+      cleanColors(data) ?? "Fail to parse log"
     );
   } catch(e) {
     console.error(e);

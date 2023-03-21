@@ -6,7 +6,17 @@ import { readConfig } from "./services/config-reader.js";
 import { JiraService } from "./services/jira.service.js";
 import { exceptionLog } from "./services/log-entries.js";
 import { minimumFields, TogglService } from "./services/toggl.service.js";
-
+import {
+    paint,
+    marker,
+    CONSOLE_COLOR_FgGreen as Green,
+    CONSOLE_COLOR_FgRed as Red,
+    CONSOLE_COLOR_Underscore as Underscore,
+    CONSOLE_COLOR_FgYellow,
+    spacer,
+    cleanColors,
+  } from "./constants.js";
+  
 const credentials = readConfig('credentials.json');
 const defaultConfig = readConfig();
 
