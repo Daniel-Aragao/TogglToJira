@@ -170,6 +170,7 @@ The current available properties:
 1. The progress bar will only be available if 
     - `-by-day` is informed
     - `date1` or `week` or `today` or `yesterday` is informed
+    - `date2` is not informed
 
 ## Toggl fields
 ```
