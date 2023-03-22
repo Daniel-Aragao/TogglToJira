@@ -79,6 +79,7 @@ export async function interpretArgument(value, services) {
         services.Arguments.From = toPartialISOString(sunday);
         services.Arguments.To = toPartialISOString(saturdayInclusive);
         services.Arguments.preview.groupByDay = true;
+        services.Arguments.preventMerge = true;
         services.Arguments.preview.week = weekN || getWeekNumber(sunday);
     } else if(value === '-by-day'){
         services.Arguments.preview.groupByDay = true;

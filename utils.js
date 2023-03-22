@@ -51,6 +51,7 @@ export const mapToJira = (timeLogs) => {
   });
 };
 
+// TODO: only merge for entries in the same day
 export const mergeEntries = (timeLogs, fullMerge = false) => {
   return timeLogs.reduce((previous, currentLog, i) => {
     let repeated = previous.find((log) => {

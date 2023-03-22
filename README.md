@@ -141,12 +141,13 @@ LB-550
 | date1 | Set date1 as informed and date2 as one day after date1, so it will return every log from date1 only |
 | `today` | Shortcut to set date1 = today's date and date2 as tomorrow, returning only the logs from today |
 | `yesterday` | Shortcut to set date1 = yesterday's date and date2 as today, returning only the logs from yesterday |
-| `week` | Shortcut to set date1 = this week's sunday date and date2 as next week's sunday, returning only the logs from this week. Sets `-by-day` |
+| `week` | Shortcut to set date1 = this week's sunday date and date2 as next week's sunday, returning only the logs from this week. Sets `-by-day` and `-pm` |
 | `week=number` | Same as week, but gives the option to select the week of the current year |
 | `from=`date | Set the start date respecting the time [RFC3339](https://www.rfc-editor.org/rfc/rfc3339#page-10) format (`2023-02-28T22:39:00Z`) for GMT (always including Z) |
 | `to=`date | Set the end date respecting the time [RFC3339](https://www.rfc-editor.org/rfc/rfc3339#page-10) format for GMT (always including Z). Ignored in case `from=` is not informed |
 | `-pm` / `prevent-merge` | Prevent that items with the same ticket and description are converted to the same log |
 | `-fm` / `full-merge` | Force items with the same ticket been merged in the same log|
+| `-c` / `clean-formatting` | Remove color formatting to avoid strange characters on some terminals |
 | `-by-day` | When in preview mode, group by start date in a simplified preview form|
 
 ## Warnings
