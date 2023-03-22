@@ -8,17 +8,16 @@ import {
   formatJiraLogs,
   filterLogs,
   groupByDay,
-  formatToHour
+  formatToHour,
+  getProgressBar,
+  spacer
 } from "./utils.js";
 import {
   paint,
   marker,
   CONSOLE_COLOR_FgGreen as Green,
   CONSOLE_COLOR_FgRed as Red,
-  CONSOLE_COLOR_Underscore as Underscore,
-  CONSOLE_COLOR_FgYellow,
-  spacer,
-  cleanColors,
+  CONSOLE_COLOR_Underscore as Underscore
 } from "./constants.js";
 import { Log } from "./services/logger.js";
 
@@ -31,6 +30,7 @@ export async function Main(services) {
   // Preview
   if (services.Arguments.preview.isActive) {
     let total = 0;
+    let periodExpectedHours = services.UserData.expectedHours;
     
     if(services.Arguments.preview.groupByDay) {
       let timeLogsByDay = groupByDay(timeLogs);
@@ -50,7 +50,12 @@ export async function Main(services) {
         let timeLogsPerDay = filterLogs(group.timeLogs, reportLogs);
 
         total += previewSingleLine(group.day, timeLogsPerDay, reportLogs, log)
-      })
+      });
+
+      if(services.UserData.expectedPeriod === 'week' && timeLogsByDay.length == 1) {
+        periodExpectedHours = periodExpectedHours / 5;
+      }
+
     } else {
       let reportLogs = [];
     
@@ -63,7 +68,14 @@ export async function Main(services) {
       total = preview(services.Arguments.From, services.Arguments.To, timeLogs, reportLogs, log)
     }
 
-    let foot = ` Total worked hours ${paint(Green, toDuration(total))}`;
+    let progressStr = "";
+
+    if(services.UserData.expectedHours && services.Arguments.preview.groupByDay && services.Arguments.preview.showProgressBar) {
+      progressStr = "  " + getProgressBar(total, periodExpectedHours , 15, services.Arguments.formatting);
+    }
+
+    let foot = ` Total worked hours ${paint(Green, toDuration(total))}${progressStr}`;
+
     log(`${marker}${spacer(foot, 46, 'end')}${marker}`);
   } else {
     // Push

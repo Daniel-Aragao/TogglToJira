@@ -1,4 +1,4 @@
-import { cleanColors } from "../constants.js";
+import { cleanColors } from "../utils.js";
 
 export const Log = cleanFormat => (str) => {
     if(cleanFormat){

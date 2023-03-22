@@ -7,30 +7,26 @@ import { JiraService } from "./services/jira.service.js";
 import { exceptionLog } from "./services/log-entries.js";
 import { minimumFields, TogglService } from "./services/toggl.service.js";
 import {
-    paint,
-    marker,
-    CONSOLE_COLOR_FgGreen as Green,
-    CONSOLE_COLOR_FgRed as Red,
-    CONSOLE_COLOR_Underscore as Underscore,
-    CONSOLE_COLOR_FgYellow,
-    spacer,
-    cleanColors,
-  } from "./constants.js";
+    paint, CONSOLE_COLOR_FgYellow
+} from "./constants.js";
   
 const credentials = readConfig('credentials.json');
 const defaultConfig = readConfig();
+const userDataConfig = readConfig('user-data.json', true);
 
 let services = {
     Toggl: new TogglService(defaultConfig, credentials),
     Jira: new JiraService(defaultConfig, credentials),
     Credentials: credentials,
+    UserData: userDataConfig.get(),
     Arguments: {
         interval: {From: '', To: ''}, 
         preview: {
             isActive: true,
             fields: JSON.parse(JSON.stringify(minimumFields)),
             groupByDay: false,
-            week: undefined
+            week: undefined,
+            showProgressBar: false
         },
         preventMerge: false,
         fullMerge: false,

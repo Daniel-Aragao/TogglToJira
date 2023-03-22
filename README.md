@@ -150,12 +150,26 @@ LB-550
 | `-c` / `clean-formatting` | Remove color formatting to avoid strange characters on some terminals |
 | `-by-day` | When in preview mode, group by start date in a simplified preview form|
 
+## More configurations
+The user might want to set some default configs inside the `config/user-data.json`
+> If the fiile doesn't exists the first run should create the file for you, you can try and run `up-time week`
+The current available properties:
+```
+{
+    "expectedHours": 37.5, // Value for expected hours of work to calculate the progress bar
+    "expectedPeriod": "week" // One of the values in ['week']. Period to considerate for the progress bar
+}
+```
+
 ## Warnings
 1. The date is going to be converted to GMT so if you are not aware of your logs try to set preview mode with `-p`
 1. The dates shall not be the same or the results are going to be empty
     - If you want a specific day try to use the date you want and the date + 1 day
 1. The tool currently doesn't check for duplicates, be aware of your input
 1. Jira only accepts logs with more than 60 seconds so anything lower than this is going to be discarded
+1. The progress bar will only be available if 
+    - `-by-day` is informed
+    - `date1` or `week` or `today` or `yesterday` is informed
 
 ## Toggl fields
 ```

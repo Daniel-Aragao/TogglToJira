@@ -31,23 +31,3 @@ export const CONSOLE_COLOR_BgGray = "\x1b[100m"
 
 export const paint = (color, text) => `${color}${text}${CONSOLE_COLOR_Reset}`
 export const marker = paint(CONSOLE_COLOR_FgYellow, ':::');
-export const cleanColors = (str) => str.replace(/\x1b\[\d{1,2}m/g, '');
-
-export const spacer = (text, qtd, pos = 'center', char = ' ') => {
-    let size = cleanColors(text).length;
-    let toPad = (qtd - size);
-    let begin =  parseInt(toPad / 2);
-    let end = toPad - begin;
-    
-    if(pos == 'center') {
-        return ''.padStart(begin, char) + text + ''.padEnd(end, char);
-        
-    } else if(pos == 'start') {
-        return ''.padStart(toPad, char) + text;
-        
-    } else if(pos = 'end') {
-        return text + ''.padEnd(toPad, char);
-
-    }
-}
-'::: From 2023-03-13 ::: 07.01h          = 07.01h'

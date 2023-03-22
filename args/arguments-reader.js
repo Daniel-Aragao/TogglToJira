@@ -21,6 +21,7 @@ export async function interpretArgument(value, services) {
         if(!services.Arguments.To) {
             let fromDate = toDateFromISOtoGMT(dates[1]);
             services.Arguments.To = toPartialISOString(new Date(fromDate.setDate(fromDate.getDate() + 1)));
+            services.Arguments.preview.showProgressBar = true;
         }
 
     } else if(value.startsWith('from=')) {
@@ -49,12 +50,15 @@ export async function interpretArgument(value, services) {
         
         today.setDate(today.getDate() + 1);
         services.Arguments.To = toPartialISOString(today);
+
+        services.Arguments.preview.showProgressBar = true;
     } else if(value === 'yesterday') {
         let today = new Date();
         services.Arguments.To = toPartialISOString(today);
         
         today.setDate(today.getDate() - 1);
         services.Arguments.From = toPartialISOString(today);
+        services.Arguments.preview.showProgressBar = true;
     } else if(value === 'prevent-merge' || value === '-pm') {
         services.Arguments.preventMerge = true;
     } else if(value === 'full-merge' || value === '-fm') {
@@ -78,9 +82,12 @@ export async function interpretArgument(value, services) {
 
         services.Arguments.From = toPartialISOString(sunday);
         services.Arguments.To = toPartialISOString(saturdayInclusive);
+
+        services.Arguments.preview.week = weekN || getWeekNumber(sunday);
         services.Arguments.preview.groupByDay = true;
         services.Arguments.preventMerge = true;
-        services.Arguments.preview.week = weekN || getWeekNumber(sunday);
+        services.Arguments.preview.showProgressBar = true;
+
     } else if(value === '-by-day'){
         services.Arguments.preview.groupByDay = true;
 

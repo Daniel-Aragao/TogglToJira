@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { cleanColors } from "../constants.js";
-import { __dirname } from "../utils.js";
+import { __dirname, cleanColors } from "../utils.js";
 
 const getFileName = (dir, file) => path.join(dir, `${file}.json`);
 

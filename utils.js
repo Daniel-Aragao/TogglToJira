@@ -1,5 +1,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
+import {CONSOLE_COLOR_Reset, CONSOLE_COLOR_BgGreen, CONSOLE_COLOR_BgWhite, CONSOLE_COLOR_FgBlack} from './constants.js';
 
 export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -249,4 +250,72 @@ export function getDateOfWeek(w) {
   var d = (1 + (w - 1) * 7); // 1st of January + 7 days for each week
 
   return new Date(new Date().getFullYear(), 0, d);
+}
+
+export const cleanColors = (str) => str.replace(/\x1b\[\d{1,2}m/g, '');
+
+export const spacer = (text, qtd, pos = 'center', char = ' ') => {
+    let size = cleanColors(text).length;
+    let toPad = (qtd - size);
+    let begin =  parseInt(toPad / 2);
+    let end = toPad - begin;
+    
+    if(pos == 'center') {
+        return ''.padStart(begin, char) + text + ''.padEnd(end, char);
+        
+    } else if(pos == 'start') {
+        return ''.padStart(toPad, char) + text;
+        
+    } else if(pos = 'end') {
+        return text + ''.padEnd(toPad, char);
+
+    }
+}
+
+const getProgressBarText = (totalHours, expected, barCharSize) => {
+  let bar = '';
+
+  if(barCharSize > 5) {
+    let hourStr = totalHours.toFixed(2).padStart(5, 0);
+    
+    if(barCharSize > 14) {
+      hourStr += ` / `
+      
+      if(expected > totalHours) {
+        hourStr += `-${(expected - totalHours).toFixed(2).padStart(5, 0)}`;
+      } else {
+        hourStr += `+${(totalHours - expected).toFixed(2).padStart(5, 0)}`;
+      }
+    } else if(barCharSize > 13) {
+      hourStr += ' / ' + expected.toFixed(2).padStart(5, 0);
+    }
+
+    bar += spacer(hourStr, barCharSize);
+  }
+
+  return bar;
+}
+
+export function getProgressBar(total, expected, barCharSize, format = true) {
+  let totalHours = total / (60 * 60);
+
+  let percentage = Math.min(totalHours / expected, 1);
+
+  let inProgressSize = Math.floor(barCharSize * percentage);
+  // let missingSize = barCharSize - inProgressSize;
+
+  let bar = getProgressBarText(totalHours, expected, barCharSize);
+
+  // Add colors
+  if(format) {
+    let barArray = bar.split("");
+    barArray.splice(inProgressSize, 0, CONSOLE_COLOR_BgWhite);
+    bar = barArray.join('');
+  
+    bar = CONSOLE_COLOR_BgGreen + CONSOLE_COLOR_FgBlack + bar;
+  
+    bar += CONSOLE_COLOR_Reset;
+  }
+
+  return bar;
 }

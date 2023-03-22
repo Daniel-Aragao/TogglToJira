@@ -4,7 +4,13 @@ import { __dirname } from "../utils.js";
 
 const getFileName = (dir, file) => path.join(__dirname, dir, file);
 
-export function readConfig(file = "default.json", dir = "config") {
+const writeToFile = (pathName, obj) => {
+  fs.writeFileSync(pathName, JSON.stringify(obj, null, 4), {
+    encoding: "utf8",
+  });
+}
+
+export function readConfig(file = "default.json", create = true, dir = "config") {
   const pathName = getFileName(dir, file);
   let exists = false;
 
@@ -15,7 +21,15 @@ export function readConfig(file = "default.json", dir = "config") {
     data = fs.readFileSync(getFileName(dir, file), { encoding: "utf8" });
     exists = true;
     dataObj = JSON.parse(data);
-  }
+  } else if(create){
+    dataObj = {
+      expectedHours: 37.5,
+      expectedPeriod: "week"
+    };
+
+    exists = true;
+    writeToFile(pathName, dataObj);
+  }  
 
   return {
     get: () => {
@@ -27,9 +41,7 @@ export function readConfig(file = "default.json", dir = "config") {
     },
 
     set: (newObj) => {
-      fs.writeFileSync(pathName, JSON.stringify(newObj, null, 4), {
-        encoding: "utf8",
-      });
+      writeToFile(pathName, newObj);
       dataObj = newObj;
       exists = true;
     },
