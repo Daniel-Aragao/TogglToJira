@@ -118,7 +118,10 @@ export const formatLogsDurationToSecond = (timeLogs) => {
     if(log.duration < 0) {
       log.duration = Math.floor((new Date() - new Date(log.start)) / 1000)
     }
-    total += log.duration;
+
+    if(log.currentStatus.includes('In progress')) {
+      total += log.duration;
+    }
 
     return {
       ...log,

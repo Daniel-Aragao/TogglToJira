@@ -172,6 +172,17 @@ The current available properties:
     - `date1` or `week` or `today` or `yesterday` is informed
     - `date2` is not informed
 
+## Preview notes
+1. In this mode nothing is pushed
+1. It will sum everything in the `to send` section as well as the `Filtered time logs` with the status `In progress`
+    1. This will appear separated in the `-by-day` argument for example `+ 00.00h`:
+    ```
+    :::        From 2023-03-23 To 2023-03-24         :::
+    ::: Date 2023-03-23 ::: 05.35h + 00.00h = 05.35h :::
+    ::: Total worked hours 05:21:10  05.35 / -02.15  :::
+    ```
+
+
 ## Toggl fields
 ```
 {
