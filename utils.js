@@ -278,19 +278,14 @@ export const spacer = (text, qtd, pos = 'center', char = ' ') => {
 const getProgressBarText = (totalHours, expected, barCharSize) => {
   let bar = '';
 
-  if(barCharSize > 5) {
-    let hourStr = totalHours.toFixed(2).padStart(5, 0);
-    
-    if(barCharSize > 14) {
-      hourStr += ` / `
-      
-      if(expected > totalHours) {
-        hourStr += `-${(expected - totalHours).toFixed(2).padStart(5, 0)}`;
-      } else {
-        hourStr += `+${(totalHours - expected).toFixed(2).padStart(5, 0)}`;
-      }
-    } else if(barCharSize > 13) {
-      hourStr += ' / ' + expected.toFixed(2).padStart(5, 0);
+  if(barCharSize >= 5) {
+    let signal = expected <= totalHours ? ' ' : '-';
+    let hourStr = `${signal}${Math.abs(expected - totalHours).toFixed(1).padStart(4, 0)}`
+
+    if(barCharSize >= 12) {
+      let percentage = Math.floor(Math.min(totalHours / expected, 1) * 100).toString().padStart(3, ' ') + '%';
+
+      hourStr = `${percentage} | ${hourStr}`;
     }
 
     bar += spacer(hourStr, barCharSize);
@@ -305,12 +300,11 @@ export function getProgressBar(total, expected, barCharSize, format = true) {
   let percentage = Math.min(totalHours / expected, 1);
 
   let inProgressSize = Math.floor(barCharSize * percentage);
-  // let missingSize = barCharSize - inProgressSize;
 
-  let bar = getProgressBarText(totalHours, expected, barCharSize);
-
+  
   // Add colors
   if(format) {
+    let bar = getProgressBarText(totalHours, expected, barCharSize);
     let barArray = bar.split("");
     barArray.splice(inProgressSize, 0, CONSOLE_COLOR_BgWhite);
     bar = barArray.join('');
@@ -318,7 +312,21 @@ export function getProgressBar(total, expected, barCharSize, format = true) {
     bar = CONSOLE_COLOR_BgGreen + CONSOLE_COLOR_FgBlack + bar;
   
     bar += CONSOLE_COLOR_Reset;
+    
+    return bar;
+  } else if(barCharSize >= 12) {
+    inProgressSize = Math.floor((barCharSize - 5) * percentage);
+    let missingSize = (barCharSize - 5) - inProgressSize;
+    let bar = getProgressBarText(totalHours, expected, 5);
+
+    bar = bar.trim();
+    bar = ''.padStart(missingSize, '.') + bar;
+    bar = ''.padStart(inProgressSize, '#') + bar;
+    // ###.......
+    return bar;
+  } else if(barCharSize >= 4) {
+    return Math.floor(percentage * 100).toString().padStart(3, ' ') + '%';
   }
 
-  return bar;
+  return ""
 }
