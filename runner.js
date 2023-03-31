@@ -90,7 +90,7 @@ export async function Main(services) {
   
       let jiraTimeLogs = mapToJira(timeLogs);
   
-      await services.Jira.pushLogs(jiraTimeLogs);
+      // await services.Jira.pushLogs(jiraTimeLogs);
   
       const sent = jiraTimeLogs.filter((jiraLogs) => jiraLogs.uploadedOnJira);
       const notSent = jiraTimeLogs.filter((jiraLogs) => !jiraLogs.uploadedOnJira);

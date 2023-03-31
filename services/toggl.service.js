@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { toDateFromISOtoGMT, toPartialISOString } from "../utils.js";
 
 export const minimumFields = ["id", "start", "duration", "description"];
-const ticketRegex = /(\w{1,3}-\d{1,5})\s*(.*)/;
+const ticketRegex = /(\w{1,8}-\d{1,5})\s*(.*)/;
 
 const addFields = (fields) => {
   minimumFields.forEach((field) => {

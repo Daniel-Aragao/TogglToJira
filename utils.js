@@ -24,6 +24,16 @@ export const toJiraDateFromToggl = (dateString) => {
   );
 };
 
+export const isSameDayFromString = (d1, d2) => {
+  return isSameDay(toDateFromISOtoGMT(d1), toDateFromISOtoGMT(d2));
+}
+
+export const isSameDay = (d1, d2) => {
+  return d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+}
+
 export const mapToJira = (timeLogs) => {
   return timeLogs.map((log) => {
     return {
@@ -52,21 +62,20 @@ export const mapToJira = (timeLogs) => {
   });
 };
 
-// TODO: only merge for entries in the same day
 export const mergeEntries = (timeLogs, fullMerge = false) => {
   return timeLogs.reduce((previous, currentLog, i) => {
     let repeated = previous.find((log) => {
       const hasSameTicket = log.ticket === currentLog.ticket;
-      const hasDescription =
+      const hasSameDescription =
         log.description.split(";").indexOf(currentLog.description) >= 0;
 
-      return hasSameTicket && (fullMerge || hasDescription);
+      return hasSameTicket && (fullMerge || hasSameDescription) && isSameDayFromString(log.start, currentLog.start);
     });
 
     if (repeated) {
       repeated.duration += currentLog.duration;
       repeated.id += `_${currentLog.id}`;
-      repeated.description += `; ${currentLog.description}`;
+      repeated.description += repeated.description ? `; ${currentLog.description}`:'';
     } else {
       previous.push({ ...currentLog });
     }
@@ -99,7 +108,7 @@ export const formatLogsDurationToHour = (timeLogs) => {
 
     return {
       ...log,
-      id: formatDescription(log.id.toString()),
+      id: formatDescription(log.id.toString(), 10),
       description: formatDescription(log.description),
       duration: formatToHour(log.duration)
     }
@@ -107,7 +116,7 @@ export const formatLogsDurationToHour = (timeLogs) => {
 
   let totalFormatted = formatToHour(total);
 
-  result.push({description: "======================== TOTAL ========================", duration: totalFormatted})
+  result.push({description: "================== TOTAL =================", duration: totalFormatted})
   return {logs: result, total: total, totalFormatted: totalFormatted};
 }
 
@@ -123,17 +132,20 @@ export const formatLogsDurationToSecond = (timeLogs) => {
       total += log.duration;
     }
 
+    // 600 seconds = 10 min
+    let durationTxt = log.duration >= 600 ? `${log.duration}s` : `${formatToHour(log.duration)}`;
+
     return {
       ...log,
-      id: formatDescription(log.id.toString()),
+      id: formatDescription(log.id.toString(), 10),
       description: formatDescription(log.description),
-      duration: `${log.duration}s (${formatToHour(log.duration)})`
+      duration: durationTxt
     }
   });
 
-  let totalFormatted = `${formatToSeconds(total)}(${formatToHour(total)})`;
+  let totalFormatted = total >= 600 ? `${formatToSeconds(total)}`:`${formatToHour(total)}`;
 
-  result.push({description: "======================== TOTAL ========================", duration: totalFormatted})
+  result.push({description: "================== TOTAL =================", duration: totalFormatted})
   return {logs: result, total: total, totalFormatted: totalFormatted};
 }
 
@@ -144,7 +156,7 @@ export const formatJiraLogs = (jiraTimeLogs) => {
     total += log.data.timeSpentSeconds;
 
     return {
-      id: formatDescription(log.id.toString()),
+      id: formatDescription(log.id.toString(), 10),
       ticket: log.ticket,
       description: formatDescription(log.data?.comment?.content?.[0]?.content?.[0]?.text),
       duration: formatToHour(log.data.timeSpentSeconds)
@@ -155,12 +167,12 @@ export const formatJiraLogs = (jiraTimeLogs) => {
   return result;
 }
 
-const formatDescription = (description) => {
+const formatDescription = (description, size = 30) => {
   if(!description) return undefined;
-  if(description.length > 55 ) {
-    return description?.substring(0, 52) + "...";
+  if(description.length > size ) {
+    return description?.substring(0, size - 3) + "...";
   } else {
-    return description?.substring(0, 55);
+    return description?.substring(0, size);
   }
 }
 /**
