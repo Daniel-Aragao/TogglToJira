@@ -113,11 +113,11 @@ The field `ticket` is extracted from the description using regex, this will be u
 
 To make the mapping work the user must respect the pattern on his time log tool:
 ```
-<ticket(1-3 chars)>-<1-5 numbers>description?
+<ticket(1-8 chars)>-<1-7 numbers>description?
 ```
 Regex:
 ```
-/(\w{1,3}-\d{1,5})\s*(.*)/
+/(\w{1,8}-\d{1,7})\s*(.*)/
 ```
 ### Examples
 #### With or without spacing
