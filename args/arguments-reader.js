@@ -9,9 +9,10 @@ const weekNumberRegex = /^week(?:=(\d{1,2}))?$/
 export async function interpretArgument(value, services) {
     if(value.startsWith('toggl-user')) {
         await configToggl(value, services.Toggl, services.Credentials);
-        
+        services.Arguments.addingConfig = true;
     } else if(value.startsWith('jira-user')){
         configJira(value, services.Jira, services.Credentials);
+        services.Arguments.addingConfig = true;
 
     }else if(dateRegex.test(value)){
         let dates = dateRegex.exec(value);
